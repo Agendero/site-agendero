@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  agendero-app:
+    image: your-dockerhub-username/agendero:latest
+    container_name: agendero-app
+    ports:
+      - "3000:3000"
+    environment:
+      - URL_LOGO=https://minio01.agendero.com/api/v1/buckets/apisite/objects/download?preview=true&prefix=logo.png&version_id=null
+    restart: unless-stopped

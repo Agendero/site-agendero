@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda - Sistema de Agendamento</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <%- include('partials/nav') %>
+        
+        <main class="main-content">
+            <h1>Minha Agenda</h1>
+            <div class="agenda-container">
+                <div class="calendar-header">
+                    <button class="btn-secondary">< Anterior</button>
+                    <h2>Dezembro 2024</h2>
+                    <button class="btn-secondary">Próximo ></button>
+                </div>
+                
+                <div class="schedule-view">
+                    <div class="schedule-header">
+                        <div class="time-column">Horário</div>
+                        <div class="days-row">
+                            <div class="day-cell">Segunda</div>
+                            <div class="day-cell">Terça</div>
+                            <div class="day-cell">Quarta</div>
+                            <div class="day-cell">Quinta</div>
+                            <div class="day-cell">Sexta</div>
+                        </div>
+                    </div>
+                    
+                    <div class="schedule-grid">
+                        <div class="time-slots">
+                            <% for(let hour = 8; hour <= 18; hour++) { %>
+                                <div class="time-slot"><%= hour %>:00</div>
+                            <% } %>
+                        </div>
+                        <div class="appointments-grid">
+                            <!-- Exemplo de agendamento -->
+                            <div class="appointment" style="grid-row: 2 / span 2; grid-column: 3;">
+                                <div class="appointment-content">
+                                    <h4>Dr. Silva</h4>
+                                    <p>Consulta Regular</p>
+                                    <span class="appointment-time">09:00 - 10:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Adicionar funcionalidade de navegação do calendário aqui
+        document.addEventListener('DOMContentLoaded', function() {
+            // Código para manipular os eventos do calendário
+        });
+    </script>
+</body>
+</html>

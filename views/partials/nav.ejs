@@ -1,0 +1,31 @@
+<nav class="main-nav">
+    <div class="nav-brand">
+        <img src="<%= logoUrl %>" alt="Logo" class="nav-logo">
+    </div>
+    <button class="hamburger-menu" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <ul class="nav-links">
+        <li><a href="/agenda" class="<%= path === '/agenda' ? 'active' : '' %>">Agenda</a></li>
+        <li><a href="/settings" class="<%= path === '/settings' ? 'active' : '' %>">Configurações</a></li>
+        <li><a href="/logout" class="nav-logout">Sair</a></li>
+    </ul>
+</nav>
+<script>
+    document.querySelector('.hamburger-menu').addEventListener('click', function() {
+        this.classList.toggle('active');
+        document.querySelector('.nav-links').classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        const nav = document.querySelector('.main-nav');
+        const hamburger = document.querySelector('.hamburger-menu');
+        if (!nav.contains(e.target)) {
+            hamburger.classList.remove('active');
+            document.querySelector('.nav-links').classList.remove('active');
+        }
+    });
+</script>

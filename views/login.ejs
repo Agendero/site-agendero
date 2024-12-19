@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Agendamento</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://unpkg.com/imask"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <div class="login-logo">               
+                <img src="<%= logoUrl %>" alt="Logo Agendero">
+            </div>
+            <form action="/login" method="POST" class="login-form">
+                <div class="form-group">
+                    <label for="phone">DDD + Celular:</label>
+                    <input type="text" id="phone" name="phone" 
+                           placeholder="(00) 00000-0000" 
+                           required>
+                </div>
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Aplicar máscara ao campo de telefone
+        const phoneInput = document.getElementById('phone');
+        const maskOptions = {
+            mask: '(00) 00000-0000'
+        };
+        const mask = IMask(phoneInput, maskOptions);
+
+        // Validação do formulário
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            const phone = mask.unmaskedValue;
+            if (phone.length !== 11) {
+                e.preventDefault();
+                alert('Por favor, insira um número de telefone válido com DDD');
+            }
+        });
+    </script>
+</body>
+</html>
