@@ -7,10 +7,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - URL_LOGO=https://minio01.agendero.com/api/v1/buckets/apisite/objects/download?preview=true&prefix=logo.png&version_id=null
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=6b1173be948e7f665bf11c2f043c2203
-      - DB_HOST=185.217.127.77
-      - DB_PORT=5432
-      - DB_DATABASE=agendero
+      - PORT=${PORT}
+      - URL_LOGO=${URL_LOGO}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - Authentication__ApiKey=${Authentication__ApiKey}
+      - URL_API=${URL_API}
     restart: unless-stopped

@@ -100,6 +100,13 @@ body {
     display: flex;
     list-style: none;
     gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin: 0;
+    padding: 0;
 }
 
 .nav-links a {
@@ -107,11 +114,17 @@ body {
     color: var(--text-color);
     font-weight: 500;
     transition: color 0.3s;
+    padding: 0.5rem 1rem;
+    display: block;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
     color: var(--primary-color);
+}
+
+.nav-logout {
+    color: #e74c3c !important;
 }
 
 .hamburger-menu {
@@ -147,6 +160,42 @@ body {
     transform: rotate(-45deg) translate(7px, -7px);
 }
 
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        gap: 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-links li:last-child {
+        border-bottom: none;
+    }
+
+    .nav-links a {
+        padding: 1rem 2rem;
+    }
+}
+
 /* Main Content */
 .app-container {
     min-height: 100vh;
@@ -157,6 +206,61 @@ body {
 .main-content {
     padding: 2rem;
     flex-grow: 1;
+}
+
+/* Companies Page */
+.companies-container {
+    background: none;
+    min-height: auto;
+    padding: 0;
+    display: block;
+    position: static;
+}
+
+.companies-container::before {
+    display: none;
+}
+
+.table-responsive {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    margin: 0 0.25rem;
+}
+
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    background-color: var(--secondary-color);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
 }
 
 /* Forms */
