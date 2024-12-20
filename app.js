@@ -45,6 +45,20 @@ const getApiHeaders = () => ({
     'Accept': 'application/json'
 });
 
+// Função para formatar número de telefone
+const formatPhoneNumber = (number) => {
+    if (!number) return '';
+    
+    // Remove tudo que não for número
+    const cleaned = number.toString().replace(/\D/g, '');
+    
+    // Verifica se tem a quantidade correta de dígitos
+    if (cleaned.length !== 11) return number;
+    
+    // Formata o número como (XX) XXXXX-XXXX
+    return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
+};
+
 // API proxy routes
 app.get('/api/companies', requireAuth, async (req, res) => {
     try {
@@ -66,7 +80,6 @@ app.get('/api/companies', requireAuth, async (req, res) => {
 
 app.get('/api/companies/:id', requireAuth, async (req, res) => {
     try {
-        console.log('Fetching company details for ID:', req.params.id);
         const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
             headers: getApiHeaders()
         });
@@ -83,7 +96,6 @@ app.get('/api/companies/:id', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company details fetched successfully');
         res.json(data);
     } catch (error) {
         console.error('Error fetching company:', error);
@@ -98,7 +110,6 @@ app.get('/api/companies/:id', requireAuth, async (req, res) => {
 
 app.post('/api/companies', requireAuth, async (req, res) => {
     try {
-        console.log('Creating new company with data:', req.body);
         const response = await fetch(`${apiBaseUrl}/companies`, {
             method: 'POST',
             headers: getApiHeaders(),
@@ -117,7 +128,6 @@ app.post('/api/companies', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company created successfully:', data);
         res.json(data);
     } catch (error) {
         console.error('Error creating company:', error);
@@ -132,8 +142,6 @@ app.post('/api/companies', requireAuth, async (req, res) => {
 
 app.put('/api/companies/:id', requireAuth, async (req, res) => {
     try {
-        console.log('Updating company ID:', req.params.id);
-        console.log('Update data:', req.body);
         const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
             method: 'PUT',
             headers: getApiHeaders(),
@@ -152,7 +160,6 @@ app.put('/api/companies/:id', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company updated successfully:', data);
         res.json(data);
     } catch (error) {
         console.error('Error updating company:', error);
@@ -167,7 +174,6 @@ app.put('/api/companies/:id', requireAuth, async (req, res) => {
 
 app.delete('/api/companies/:id', requireAuth, async (req, res) => {
     try {
-        console.log('Deleting company ID:', req.params.id);
         const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
             method: 'DELETE',
             headers: getApiHeaders()
@@ -185,7 +191,6 @@ app.delete('/api/companies/:id', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company deleted successfully');
         res.json(data);
     } catch (error) {
         console.error('Error deleting company:', error);
@@ -214,7 +219,7 @@ app.post('/login', (req, res) => {
     if (cleanPhone && cleanPhone.length === 11) {
         req.session.user = { 
             phone: cleanPhone,
-            formattedPhone: phone 
+            formattedPhone: formatPhoneNumber(phone) 
         };
         res.redirect('/agenda');
     } else {
@@ -239,30 +244,14 @@ app.get('/settings', requireAuth, (req, res) => {
 app.get('/companies', requireAuth, async (req, res) => {
     try {
         const lang = req.query.lang || 'pt';
-        console.log('=== Starting companies fetch ===');
-        console.log('Base API URL (raw):', process.env.URL_API);
-        console.log('Base API URL (from var):', apiBaseUrl);
-        
         // Garantindo que não há barras duplicadas
         const baseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
         const url = `${baseUrl}/companies`;
-        
-        console.log('Final URL:', url);
-        console.log('Expected URL: https://api.agendero.com/companies');
-        console.log('URLs match:', url === 'https://api.agendero.com/companies');
-        
+                
         const headers = getApiHeaders();
-        console.log('Headers:', {
-            ...headers,
-            'x-api-key-admin': headers['x-api-key-admin'] ? headers['x-api-key-admin'].substring(0, 8) + '...' : 'missing'
-        });
-        
         const apiResponse = await fetch(url, {
             headers: headers
         });
-
-        console.log('API Response Status:', apiResponse.status);
-        console.log('API Response Status Text:', apiResponse.statusText);
 
         if (!apiResponse.ok) {
             const errorText = await apiResponse.text();
@@ -276,24 +265,23 @@ app.get('/companies', requireAuth, async (req, res) => {
         }
 
         const companies = await apiResponse.json();
-        console.log('Companies fetched successfully. Count:', Array.isArray(companies) ? companies.length : 'Not an array');
-        console.log('First company (if exists):', companies[0]);
 
         res.render('companies', { 
             user: req.session.user,
-            path: '/companies',
+            companies: companies,
             lang: lang,
-            companies: Array.isArray(companies) ? companies : []
+            formatPhoneNumber: formatPhoneNumber,
+            path: '/companies'
         });
     } catch (error) {
-        console.error('=== Error in companies route ===');
-        console.error('Error message:', error.message);
+        console.error('Error fetching companies:', error);
         console.error('Stack trace:', error.stack);
         res.render('companies', { 
             user: req.session.user,
-            path: '/companies',
-            lang: req.query.lang || 'pt',
             companies: [],
+            lang: req.query.lang || 'pt',
+            formatPhoneNumber: formatPhoneNumber,
+            path: '/companies',
             error: `Failed to fetch companies: ${error.message}`
         });
     }
@@ -306,13 +294,9 @@ app.get('/empresa', requireAuth, (req, res) => {
 // Companies API Routes
 app.get('/api/companies/:id', requireAuth, async (req, res) => {
     try {
-        console.log('Fetching company details for ID:', req.params.id);
         const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
             headers: getApiHeaders()
         });
-
-        console.log('API Response Status:', response.status);
-        console.log('API Response Status Text:', response.statusText);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -327,7 +311,6 @@ app.get('/api/companies/:id', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company details fetched successfully');
         res.json(data);
     } catch (error) {
         console.error('Error fetching company:', error);
@@ -342,7 +325,6 @@ app.get('/api/companies/:id', requireAuth, async (req, res) => {
 
 app.post('/api/companies', requireAuth, async (req, res) => {
     try {
-        console.log('Creating new company with data:', req.body);
         const response = await fetch(`${apiBaseUrl}/companies`, {
             method: 'POST',
             headers: getApiHeaders(),
@@ -361,7 +343,6 @@ app.post('/api/companies', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company created successfully:', data);
         res.json(data);
     } catch (error) {
         console.error('Error creating company:', error);
@@ -376,8 +357,6 @@ app.post('/api/companies', requireAuth, async (req, res) => {
 
 app.put('/api/companies/:id', requireAuth, async (req, res) => {
     try {
-        console.log('Updating company ID:', req.params.id);
-        console.log('Update data:', req.body);
         const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
             method: 'PUT',
             headers: getApiHeaders(),
@@ -396,7 +375,6 @@ app.put('/api/companies/:id', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company updated successfully:', data);
         res.json(data);
     } catch (error) {
         console.error('Error updating company:', error);
@@ -411,7 +389,6 @@ app.put('/api/companies/:id', requireAuth, async (req, res) => {
 
 app.delete('/api/companies/:id', requireAuth, async (req, res) => {
     try {
-        console.log('Deleting company ID:', req.params.id);
         const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
             method: 'DELETE',
             headers: getApiHeaders()
@@ -429,7 +406,6 @@ app.delete('/api/companies/:id', requireAuth, async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Company deleted successfully');
         res.json(data);
     } catch (error) {
         console.error('Error deleting company:', error);

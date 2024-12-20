@@ -46,32 +46,31 @@
                                     <th><%= lang === 'pt' ? 'Atividade' : 'Activity' %></th>
                                     <th><%= lang === 'pt' ? 'Responsável' : 'Responsible' %></th>
                                     <th><%= lang === 'pt' ? 'Email' : 'Email' %></th>
-                                    <th><%= lang === 'pt' ? 'Telefone' : 'Phone' %></th>
+                                    <th><%= lang === 'pt' ? 'Celular' : 'Mobile' %></th>
                                     <th><%= lang === 'pt' ? 'Ações' : 'Actions' %></th>
                                 </tr>
                             </thead>
                             <tbody id="companiesTableBody">
                                 <% companies.forEach(function(company) { %>
                                     <tr>
-                                        <td><%= company.name || '-' %></td>
-                                        <td><%= company.activity || '-' %></td>
-                                        <td><%= company.responsible || '-' %></td>
-                                        <td><%= company.email || '-' %></td>
-                                        <td><%= company.phoneNumber || '-' %></td>
-                                        <td>
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <button class="btn btn-sm btn-primary" onclick="editCompany('<%= company.id %>')" title="<%= lang === 'pt' ? 'Editar' : 'Edit' %>">
+                                        <td data-label="<%= lang === 'pt' ? 'Nome' : 'Name' %>"><%= company.name || '-' %></td>
+                                        <td data-label="<%= lang === 'pt' ? 'Atividade' : 'Activity' %>"><%= company.activity || '-' %></td>
+                                        <td data-label="<%= lang === 'pt' ? 'Responsável' : 'Responsible' %>"><%= company.responsible || '-' %></td>
+                                        <td data-label="<%= lang === 'pt' ? 'Email' : 'Email' %>"><%= company.email || '-' %></td>
+                                        <td data-label="<%= lang === 'pt' ? 'Celular' : 'Mobile' %>"><%= company.mobileNumber ? formatPhoneNumber(company.mobileNumber) : '-' %></td>
+                                        <td data-label="<%= lang === 'pt' ? 'Ações' : 'Actions' %>">
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <button class="btn btn-sm btn-primary w-100" onclick="editCompany('<%= company.id %>')" title="<%= lang === 'pt' ? 'Editar' : 'Edit' %>">
                                                         <i class="bi bi-pencil"></i>
                                                     </button>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <button class="btn btn-sm btn-danger" onclick="deleteCompany('<%= company.id %>')" title="<%= lang === 'pt' ? 'Excluir' : 'Delete' %>">
+                                                <div class="col-6">
+                                                    <button class="btn btn-sm btn-danger w-100" onclick="deleteCompany('<%= company.id %>')" title="<%= lang === 'pt' ? 'Excluir' : 'Delete' %>">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
                                             </div>
-                                           
                                         </td>
                                     </tr>
                                 <% }); %>
@@ -168,17 +167,13 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        <%= lang === 'pt' ? 'Cancelar' : 'Cancel' %>
-                                    </button>
-                                </div>
-                                <div class="col-md-6">
-                                    <button type="button" class="btn btn-primary" onclick="saveCompany()">
-                                        <%= lang === 'pt' ? 'Salvar' : 'Save' %>
-                                    </button>
-                                </div>                             
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <%= lang === 'pt' ? 'Cancelar' : 'Cancel' %>
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="saveCompany()">
+                                    <%= lang === 'pt' ? 'Salvar' : 'Save' %>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -211,15 +206,36 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/imask"></script>
     <script>
+        // Função para formatar número de telefone
+        function formatPhoneNumber(number) {
+            if (!number) return '';
+            
+            // Remove tudo que não for número
+            const cleaned = number.replace(/\D/g, '');
+            
+            // Verifica se tem a quantidade correta de dígitos
+            if (cleaned.length !== 11) return number;
+            
+            // Formata o número como (XX) XXXXX-XXXX
+            return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
+        }
+
         let currentCompanyId = null;
         const companyModal = new bootstrap.Modal(document.getElementById('companyModal'));
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-
-        // Default headers for all API requests
         const defaultHeaders = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         };
+
+        // Configuração da máscara do telefone celular
+        const mobileNumberElement = document.getElementById('mobileNumber');
+        const maskOptions = {
+            mask: '(00) 00000-0000'
+        };
+        const mobileNumberMask = IMask(mobileNumberElement, maskOptions);
 
         async function editCompany(id) {
             try {
@@ -229,7 +245,7 @@
                 
                 if (!response.ok) {
                     const error = await response.json();
-                    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(error.message || `Erro HTTP! status: ${response.status}`);
                 }
                 
                 const company = await response.json();
@@ -240,7 +256,10 @@
                 document.getElementById('responsible').value = company.responsible;
                 document.getElementById('email').value = company.email || '';
                 document.getElementById('phoneNumber').value = company.phoneNumber || '';
-                document.getElementById('mobileNumber').value = company.mobileNumber || '';
+                
+                // Atualiza o valor do campo com a máscara
+                mobileNumberMask.value = company.mobileNumber || '';
+                
                 document.getElementById('street').value = company.address?.street || '';
                 document.getElementById('number').value = company.address?.number || '';
                 document.getElementById('additionalInfo').value = company.address?.additionalInfo || '';
@@ -256,7 +275,7 @@
                 
                 companyModal.show();
             } catch (error) {
-                console.error('Error loading company:', error);
+                console.error('Erro ao carregar empresa:', error);
                 alert('<%= lang === "pt" ? "Erro ao carregar empresa" : "Error loading company" %>: ' + error.message);
             }
         }
@@ -271,6 +290,9 @@
         }
 
         async function saveCompany() {
+            // Remove a máscara para obter apenas os números
+            const mobileNumber = mobileNumberMask.unmaskedValue;
+            
             const formData = {
                 name: document.getElementById('name').value,
                 activity: document.getElementById('activity').value,
@@ -285,7 +307,7 @@
                     number: document.getElementById('number').value
                 },
                 phoneNumber: document.getElementById('phoneNumber').value,
-                mobileNumber: document.getElementById('mobileNumber').value,
+                mobileNumber: mobileNumber,
                 email: document.getElementById('email').value,
                 logo: document.getElementById('logo').value,
                 isActive: document.getElementById('isActive').checked,
@@ -306,13 +328,14 @@
 
                 if (!response.ok) {
                     const error = await response.json();
-                    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(error.message || `Erro HTTP! status: ${response.status}`);
                 }
 
+                const savedData = await response.json();
                 companyModal.hide();
                 window.location.reload();
             } catch (error) {
-                console.error('Error saving company:', error);
+                console.error('Erro ao salvar empresa:', error);
                 alert('<%= lang === "pt" ? "Erro ao salvar empresa" : "Error saving company" %>: ' + error.message);
             }
         }

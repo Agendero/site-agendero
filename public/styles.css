@@ -204,7 +204,7 @@ body {
 }
 
 .main-content {
-    padding: 2rem;
+    padding: 1rem;
     flex-grow: 1;
 }
 
@@ -229,6 +229,74 @@ body {
 
 .table {
     margin-bottom: 0;
+}
+
+/* Mobile card layout for companies */
+@media screen and (max-width: 768px) {
+    .table-responsive {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .table, .table thead, .table tbody, .table tr, .table td, .table th {
+        display: block;
+    }
+
+    .table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .table tr {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        
+    }
+
+    .table td {
+        border: none;
+        position: relative;
+        display: block;
+        padding: 0.75rem 0.5rem;
+    }
+
+    .table td:before {
+        content: attr(data-label);
+        display: block;
+        font-weight: bold;
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+
+    .table td:not(:last-child) {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table td[data-label*="Ações"],
+    .table td[data-label*="Actions"] {
+        padding: 0.5rem;
+    }
+
+    .table td[data-label*="Ações"]:before,
+    .table td[data-label*="Actions"]:before {
+        display: none;
+    }
+
+    .table td[data-label*="Ações"] .row,
+    .table td[data-label*="Actions"] .row {
+        width: 100%;
+        margin: 0;
+    }
+
+    .table td[data-label*="Ações"] .btn,
+    .table td[data-label*="Actions"] .btn {
+        width: 100%;
+    }
 }
 
 .table th {
