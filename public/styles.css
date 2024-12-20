@@ -204,8 +204,10 @@ body {
 }
 
 .main-content {
-    padding: 1rem;
+    padding: 0rem;
+    margin: 10px !important;
     flex-grow: 1;
+    background: none !important;
 }
 
 /* Companies Page */
@@ -552,6 +554,17 @@ body {
     margin-top: 1rem;
 }
 
+.tituloPage{
+    font-size: 32px !important;
+    color: white !important;
+    display: flex;
+    align-items: left;
+}
+
+nav.main-nav {
+    background-color: aliceblue;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .hamburger-menu {
@@ -593,4 +606,14 @@ body {
         gap: 1rem;
         text-align: center;
     }
+
+    .tituloPage{
+        font-size: 28px !important;
+        margin-bottom: 1rem;
+        color: white !important;
+        display: flex;
+        align-items: left;
+    }
 }
+
+
