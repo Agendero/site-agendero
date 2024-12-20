@@ -121,6 +121,7 @@
                                         <input type="tel" class="form-control" id="mobileNumber">
                                     </div>
                                 </div>
+                                
                                 <h5 class="mb-3"><%= lang === 'pt' ? 'Endereço' : 'Address' %></h5>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
@@ -143,23 +144,54 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label"><%= lang === 'pt' ? 'Estado' : 'State' %></label>
-                                        <input type="text" class="form-control" id="state">
+                                        <select class="form-select" id="state">
+                                            <option value=""><%= lang === 'pt' ? 'Selecione' : 'Select' %></option>
+                                            <option value="AC">AC - Acre</option>
+                                            <option value="AL">AL - Alagoas</option>
+                                            <option value="AP">AP - Amapá</option>
+                                            <option value="AM">AM - Amazonas</option>
+                                            <option value="BA">BA - Bahia</option>
+                                            <option value="CE">CE - Ceará</option>
+                                            <option value="DF">DF - Distrito Federal</option>
+                                            <option value="ES">ES - Espírito Santo</option>
+                                            <option value="GO">GO - Goiás</option>
+                                            <option value="MA">MA - Maranhão</option>
+                                            <option value="MT">MT - Mato Grosso</option>
+                                            <option value="MS">MS - Mato Grosso do Sul</option>
+                                            <option value="MG">MG - Minas Gerais</option>
+                                            <option value="PA">PA - Pará</option>
+                                            <option value="PB">PB - Paraíba</option>
+                                            <option value="PR">PR - Paraná</option>
+                                            <option value="PE">PE - Pernambuco</option>
+                                            <option value="PI">PI - Piauí</option>
+                                            <option value="RJ">RJ - Rio de Janeiro</option>
+                                            <option value="RN">RN - Rio Grande do Norte</option>
+                                            <option value="RS">RS - Rio Grande do Sul</option>
+                                            <option value="RO">RO - Rondônia</option>
+                                            <option value="RR">RR - Roraima</option>
+                                            <option value="SC">SC - Santa Catarina</option>
+                                            <option value="SP">SP - São Paulo</option>
+                                            <option value="SE">SE - Sergipe</option>
+                                            <option value="TO">TO - Tocantins</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label"><%= lang === 'pt' ? 'CEP' : 'Postal Code' %></label>
                                         <input type="text" class="form-control" id="postalCode">
                                     </div>
                                 </div>
+                               
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'País' : 'Country' %></label>
-                                        <input type="text" class="form-control" id="country">
+                                        <label class="form-label w-100"><%= lang === 'pt' ? 'País' : 'Country' %></label>
+                                        <input type="text" class="form-control w-100" id="country">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Logo URL</label>
-                                        <input type="text" class="form-control" id="logo">
+                                        <label class="form-label w-100"><%= lang === 'pt' ? 'URL Logotipo' : 'Logo URL' %></label>
+                                        <input type="text" class="form-control w-100 h-50" id="logo">
                                     </div>
                                 </div>
+
                                 <div class="mb-3 form-check">
                                     <input type="checkbox" class="form-check-input" id="isActive" checked>
                                     <label class="form-check-label"><%= lang === 'pt' ? 'Ativo' : 'Active' %></label>
@@ -232,10 +264,24 @@
 
         // Configuração da máscara do telefone celular
         const mobileNumberElement = document.getElementById('mobileNumber');
-        const maskOptions = {
+        const mobileNumberMask = IMask(mobileNumberElement, {
             mask: '(00) 00000-0000'
-        };
-        const mobileNumberMask = IMask(mobileNumberElement, maskOptions);
+        });
+
+        // Configuração da máscara do CEP
+        const postalCodeElement = document.getElementById('postalCode');
+        const postalCodeMask = IMask(postalCodeElement, {
+            mask: '00000-000'
+        });
+
+        function openCompanyModal() {
+            currentCompanyId = null;
+            document.getElementById('companyForm').reset();
+            document.getElementById('isActive').checked = true;
+            document.getElementById('modalTitle').textContent = 
+                '<%= lang === "pt" ? "Nova Empresa" : "New Company" %>';
+            companyModal.show();
+        }
 
         async function editCompany(id) {
             try {
@@ -264,8 +310,26 @@
                 document.getElementById('number').value = company.address?.number || '';
                 document.getElementById('additionalInfo').value = company.address?.additionalInfo || '';
                 document.getElementById('city').value = company.address?.city || '';
-                document.getElementById('state').value = company.address?.state || '';
-                document.getElementById('postalCode').value = company.address?.postalCode || '';
+                
+                // Seleciona o estado correto no select
+                const stateSelect = document.getElementById('state');
+                const stateValue = company.address?.state || '';
+                if (stateValue) {
+                    // Procura a opção com o valor do estado
+                    const option = Array.from(stateSelect.options).find(opt => opt.value === stateValue);
+                    if (option) {
+                        stateSelect.value = stateValue;
+                    } else {
+                        // Se não encontrar o estado na lista, seleciona a opção vazia
+                        stateSelect.value = '';
+                    }
+                } else {
+                    stateSelect.value = '';
+                }
+                
+                // Atualiza o CEP com a máscara
+                postalCodeMask.value = company.address?.postalCode || '';
+                
                 document.getElementById('country').value = company.address?.country || '';
                 document.getElementById('logo').value = company.logo || '';
                 document.getElementById('isActive').checked = company.isActive;
@@ -280,18 +344,10 @@
             }
         }
 
-        function openCompanyModal() {
-            currentCompanyId = null;
-            document.getElementById('companyForm').reset();
-            document.getElementById('isActive').checked = true;
-            document.getElementById('modalTitle').textContent = 
-                '<%= lang === "pt" ? "Nova Empresa" : "New Company" %>';
-            companyModal.show();
-        }
-
         async function saveCompany() {
             // Remove a máscara para obter apenas os números
             const mobileNumber = mobileNumberMask.unmaskedValue;
+            const postalCode = postalCodeMask.unmaskedValue;
             
             const formData = {
                 name: document.getElementById('name').value,
@@ -301,7 +357,7 @@
                     street: document.getElementById('street').value,
                     city: document.getElementById('city').value,
                     state: document.getElementById('state').value,
-                    postalCode: document.getElementById('postalCode').value,
+                    postalCode: postalCode,
                     country: document.getElementById('country').value,
                     additionalInfo: document.getElementById('additionalInfo').value,
                     number: document.getElementById('number').value
