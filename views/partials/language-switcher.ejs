@@ -1,0 +1,98 @@
+<div class="language-switcher">
+    <form action="/change-language" method="POST" class="d-inline">
+        <div class="language-options">
+            <div class="language-option">
+                <input type="radio" id="lang-pt" name="language" value="pt" 
+                       <%= i18n.language === 'pt' ? 'checked' : '' %>>
+                <label for="lang-pt">
+                    <img src="/images/pt-flag.png" alt="Português" title="Português">
+                </label>
+            </div>
+            <div class="language-option">
+                <input type="radio" id="lang-en" name="language" value="en"
+                       <%= i18n.language === 'en' ? 'checked' : '' %>>
+                <label for="lang-en">
+                    <img src="/images/en-flag.png" alt="English" title="English">
+                </label>
+            </div>
+            <div class="language-option">
+                <input type="radio" id="lang-es" name="language" value="es"
+                       <%= i18n.language === 'es' ? 'checked' : '' %>>
+                <label for="lang-es">
+                    <img src="/images/sp-flag.png" alt="Español" title="Español">
+                </label>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.language-switcher {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+.language-options {
+    display: flex;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+}
+
+.language-option input[type="radio"] {
+    display: none;
+}
+
+.language-option label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 3px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.language-option input[type="radio"]:checked + label {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.language-option label:hover {
+    transform: scale(1.1);
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.language-option img {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+</style>
+
+<script>
+document.querySelectorAll('.language-option input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        fetch('/change-language', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ language: this.value })
+        }).then(() => {
+            window.location.reload();
+        });
+    });
+});
+</script>

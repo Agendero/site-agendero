@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "home": "Início",
+    "companies": "Empresas",
+    "services": "Serviços",
+    "schedule": "Agenda",
+    "settings": "Configurações",
+    "logout": "Sair"
+  },
+  "login": {
+    "title": "Login - Sistema de Agendamento",
+    "phoneLabel": "DDD + Celular",
+    "enter": "Entrar",
+    "invalidPhone": "Por favor, insira um número de telefone válido com DDD"
+  },
+  "common": {
+    "welcome": "Bem-vindo",
+    "search": "Buscar",
+    "save": "Salvar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "select": "Selecione",
+    "actions": "Ações",
+    "errorLoadingStates": "Erro ao carregar estados",
+    "errorLoadingCompany": "Erro ao carregar empresa",
+    "errorSavingCompany": "Erro ao salvar empresa",
+    "errorDeletingCompany": "Erro ao excluir empresa",
+    "confirmDeletion": "Confirmar Exclusão",
+    "confirmDeletionMessage": "Tem certeza que deseja excluir esta empresa?"
+  },
+  "companies": {
+    "title": "Empresas",
+    "add": "Adicionar Empresa",
+    "name": "Nome",
+    "address": "Endereço",
+    "phone": "Telefone",
+    "email": "E-mail",
+    "mobile": "Celular",
+    "activity": "Atividade",
+    "responsible": "Responsável",
+    "street": "Rua",
+    "number": "Número",
+    "additionalInfo": "Complemento",
+    "city": "Cidade",
+    "state": "Estado",
+    "postalCode": "CEP",
+    "country": "País",
+    "logo": "URL do Logotipo",
+    "isActive": "Ativo",
+    "noCompaniesFound": "Nenhuma empresa encontrada"
+  },
+  "services": {
+    "title": "Serviços",
+    "add": "Adicionar Serviço",
+    "name": "Nome do Serviço",
+    "description": "Descrição",
+    "duration": "Duração",
+    "price": "Preço"
+  },
+  "schedule": {
+    "title": "Agendar",
+    "selectDate": "Selecione a Data",
+    "selectTime": "Selecione o Horário",
+    "selectService": "Selecione o Serviço",
+    "confirm": "Confirmar Agendamento"
+  }
+}

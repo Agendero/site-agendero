@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "home": "Home",
+    "companies": "Companies",
+    "services": "Services",
+    "schedule": "Schedule",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Login - Scheduling System",
+    "phoneLabel": "Area Code + Mobile",
+    "enter": "Enter",
+    "invalidPhone": "Please enter a valid phone number with area code"
+  },
+  "common": {
+    "welcome": "Welcome",
+    "search": "Search",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "select": "Select",
+    "actions": "Actions",
+    "errorLoadingStates": "Error loading states",
+    "errorLoadingCompany": "Error loading company",
+    "errorSavingCompany": "Error saving company",
+    "errorDeletingCompany": "Error deleting company",
+    "confirmDeletion": "Confirm Deletion",
+    "confirmDeletionMessage": "Are you sure you want to delete this company?"
+  },
+  "companies": {
+    "title": "Companies",
+    "add": "Add Company",
+    "name": "Name",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "mobile": "Mobile",
+    "activity": "Activity",
+    "responsible": "Responsible",
+    "street": "Street",
+    "number": "Number",
+    "additionalInfo": "Additional Info",
+    "city": "City",
+    "state": "State",
+    "postalCode": "Postal Code",
+    "country": "Country",
+    "logo": "Logo URL",
+    "isActive": "Active",
+    "noCompaniesFound": "No companies found"
+  },
+  "services": {
+    "title": "Services",
+    "add": "Add Service",
+    "name": "Service Name",
+    "description": "Description",
+    "duration": "Duration",
+    "price": "Price"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "selectService": "Select Service",
+    "confirm": "Confirm Appointment"
+  }
+}

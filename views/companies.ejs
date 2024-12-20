@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="<%= lang %>">
+<html lang="<%= i18n.language %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= lang === 'pt' ? 'Empresas' : 'Companies' %></title>
+    <title><%= t('companies.title') %></title>
     <link rel="stylesheet" href="/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
@@ -16,12 +16,12 @@
             <div class="companies-container container">
                 <div class="row">
                     <div class=" col-md-10 justify-content-between align-items-center">
-                        <h2><%= lang === 'pt' ? 'Empresas' : 'Companies' %></h2>
+                        <h2><%= t('companies.title') %></h2>
                     
                     </div>
                     <div class="col-md-2 d-flex justify-content-end">
                         <button class="btn btn-primary btn-sm" onclick="openCompanyModal()">
-                            <i class="bi bi-plus-lg"></i> <%= lang === 'pt' ? 'Nova Empresa' : 'New Company' %>
+                            <i class="bi bi-plus-lg"></i> <%= t('companies.add') %>
                         </button>
                     </div>  
                 </div>
@@ -36,37 +36,37 @@
                 <div class="table-responsive">
                     <% if (!companies || companies.length === 0) { %>
                         <div class="alert alert-info">
-                            <%= lang === 'pt' ? 'Nenhuma empresa encontrada' : 'No companies found' %>
+                            <%= t('companies.noCompaniesFound') %>
                         </div>
                     <% } else { %>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th><%= lang === 'pt' ? 'Nome' : 'Name' %></th>
-                                    <th><%= lang === 'pt' ? 'Atividade' : 'Activity' %></th>
-                                    <th><%= lang === 'pt' ? 'Responsável' : 'Responsible' %></th>
-                                    <th><%= lang === 'pt' ? 'Email' : 'Email' %></th>
-                                    <th><%= lang === 'pt' ? 'Celular' : 'Mobile' %></th>
-                                    <th><%= lang === 'pt' ? 'Ações' : 'Actions' %></th>
+                                    <th><%= t('companies.name') %></th>
+                                    <th><%= t('companies.activity') %></th>
+                                    <th><%= t('companies.responsible') %></th>
+                                    <th><%= t('companies.email') %></th>
+                                    <th><%= t('companies.mobile') %></th>
+                                    <th><%= t('common.actions') %></th>
                                 </tr>
                             </thead>
                             <tbody id="companiesTableBody">
                                 <% companies.forEach(function(company) { %>
                                     <tr>
-                                        <td data-label="<%= lang === 'pt' ? 'Nome' : 'Name' %>"><%= company.name || '-' %></td>
-                                        <td data-label="<%= lang === 'pt' ? 'Atividade' : 'Activity' %>"><%= company.activity || '-' %></td>
-                                        <td data-label="<%= lang === 'pt' ? 'Responsável' : 'Responsible' %>"><%= company.responsible || '-' %></td>
-                                        <td data-label="<%= lang === 'pt' ? 'Email' : 'Email' %>"><%= company.email || '-' %></td>
-                                        <td data-label="<%= lang === 'pt' ? 'Celular' : 'Mobile' %>"><%= company.mobileNumber ? formatPhoneNumber(company.mobileNumber) : '-' %></td>
-                                        <td data-label="<%= lang === 'pt' ? 'Ações' : 'Actions' %>">
+                                        <td data-label="<%= t('companies.name') %>"><%= company.name || '-' %></td>
+                                        <td data-label="<%= t('companies.activity') %>"><%= company.activity || '-' %></td>
+                                        <td data-label="<%= t('companies.responsible') %>"><%= company.responsible || '-' %></td>
+                                        <td data-label="<%= t('companies.email') %>"><%= company.email || '-' %></td>
+                                        <td data-label="<%= t('companies.mobile') %>"><%= company.mobileNumber ? formatPhoneNumber(company.mobileNumber) : '-' %></td>
+                                        <td data-label="<%= t('common.actions') %>">
                                             <div class="row g-2">
                                                 <div class="col-6">
-                                                    <button class="btn btn-sm btn-primary w-100" onclick="editCompany('<%= company.id %>')" title="<%= lang === 'pt' ? 'Editar' : 'Edit' %>">
+                                                    <button class="btn btn-sm btn-primary w-100" onclick="editCompany('<%= company.id %>')" title="<%= t('common.edit') %>">
                                                         <i class="bi bi-pencil"></i>
                                                     </button>
                                                 </div>
                                                 <div class="col-6">
-                                                    <button class="btn btn-sm btn-danger w-100" onclick="deleteCompany('<%= company.id %>')" title="<%= lang === 'pt' ? 'Excluir' : 'Delete' %>">
+                                                    <button class="btn btn-sm btn-danger w-100" onclick="deleteCompany('<%= company.id %>')" title="<%= t('common.delete') %>">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
@@ -93,118 +93,91 @@
                                 <input type="hidden" id="companyId">
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Nome' : 'Name' %> *</label>
+                                        <label class="form-label"><%= t('companies.name') %> *</label>
                                         <input type="text" class="form-control" id="name" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Atividade' : 'Activity' %> *</label>
+                                        <label class="form-label"><%= t('companies.activity') %> *</label>
                                         <input type="text" class="form-control" id="activity" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Responsável' : 'Responsible' %> *</label>
+                                        <label class="form-label"><%= t('companies.responsible') %> *</label>
                                         <input type="text" class="form-control" id="responsible" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Email</label>
+                                        <label class="form-label"><%= t('companies.email') %></label>
                                         <input type="email" class="form-control" id="email">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Telefone' : 'Phone' %></label>
+                                        <label class="form-label"><%= t('companies.phone') %></label>
                                         <input type="tel" class="form-control" id="phoneNumber">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Celular' : 'Mobile' %></label>
+                                        <label class="form-label"><%= t('companies.mobile') %></label>
                                         <input type="tel" class="form-control" id="mobileNumber">
                                     </div>
                                 </div>
                                 
-                                <h5 class="mb-3"><%= lang === 'pt' ? 'Endereço' : 'Address' %></h5>
+                                <h5 class="mb-3"><%= t('companies.address') %></h5>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Rua' : 'Street' %></label>
+                                        <label class="form-label"><%= t('companies.street') %></label>
                                         <input type="text" class="form-control" id="street">
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Número' : 'Number' %></label>
+                                        <label class="form-label"><%= t('companies.number') %></label>
                                         <input type="text" class="form-control" id="number">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Complemento' : 'Additional Info' %></label>
+                                        <label class="form-label"><%= t('companies.additionalInfo') %></label>
                                         <input type="text" class="form-control" id="additionalInfo">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Cidade' : 'City' %></label>
+                                        <label class="form-label"><%= t('companies.city') %></label>
                                         <input type="text" class="form-control" id="city">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label"><%= lang === 'pt' ? 'Estado' : 'State' %></label>
+                                        <label class="form-label"><%= t('companies.state') %></label>
                                         <select class="form-select" id="state">
-                                            <option value=""><%= lang === 'pt' ? 'Selecione' : 'Select' %></option>
-                                            <option value="AC">AC - Acre</option>
-                                            <option value="AL">AL - Alagoas</option>
-                                            <option value="AP">AP - Amapá</option>
-                                            <option value="AM">AM - Amazonas</option>
-                                            <option value="BA">BA - Bahia</option>
-                                            <option value="CE">CE - Ceará</option>
-                                            <option value="DF">DF - Distrito Federal</option>
-                                            <option value="ES">ES - Espírito Santo</option>
-                                            <option value="GO">GO - Goiás</option>
-                                            <option value="MA">MA - Maranhão</option>
-                                            <option value="MT">MT - Mato Grosso</option>
-                                            <option value="MS">MS - Mato Grosso do Sul</option>
-                                            <option value="MG">MG - Minas Gerais</option>
-                                            <option value="PA">PA - Pará</option>
-                                            <option value="PB">PB - Paraíba</option>
-                                            <option value="PR">PR - Paraná</option>
-                                            <option value="PE">PE - Pernambuco</option>
-                                            <option value="PI">PI - Piauí</option>
-                                            <option value="RJ">RJ - Rio de Janeiro</option>
-                                            <option value="RN">RN - Rio Grande do Norte</option>
-                                            <option value="RS">RS - Rio Grande do Sul</option>
-                                            <option value="RO">RO - Rondônia</option>
-                                            <option value="RR">RR - Roraima</option>
-                                            <option value="SC">SC - Santa Catarina</option>
-                                            <option value="SP">SP - São Paulo</option>
-                                            <option value="SE">SE - Sergipe</option>
-                                            <option value="TO">TO - Tocantins</option>
+                                            <option value=""><%= t('common.select') %></option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label"><%= lang === 'pt' ? 'CEP' : 'Postal Code' %></label>
+                                        <label class="form-label"><%= t('companies.postalCode') %></label>
                                         <input type="text" class="form-control" id="postalCode">
                                     </div>
                                 </div>
                                
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label w-100"><%= lang === 'pt' ? 'País' : 'Country' %></label>
+                                        <label class="form-label w-100"><%= t('companies.country') %></label>
                                         <input type="text" class="form-control w-100" id="country">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label w-100"><%= lang === 'pt' ? 'URL Logotipo' : 'Logo URL' %></label>
+                                        <label class="form-label w-100"><%= t('companies.logo') %></label>
                                         <input type="text" class="form-control w-100 h-50" id="logo">
                                     </div>
                                 </div>
 
                                 <div class="mb-3 form-check">
                                     <input type="checkbox" class="form-check-input" id="isActive" checked>
-                                    <label class="form-check-label"><%= lang === 'pt' ? 'Ativo' : 'Active' %></label>
+                                    <label class="form-check-label"><%= t('companies.isActive') %></label>
                                 </div>
                             </form>
                         </div>
                         <div class="modal-footer">
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <%= lang === 'pt' ? 'Cancelar' : 'Cancel' %>
+                                    <%= t('common.cancel') %>
                                 </button>
                                 <button type="button" class="btn btn-primary" onclick="saveCompany()">
-                                    <%= lang === 'pt' ? 'Salvar' : 'Save' %>
+                                    <%= t('common.save') %>
                                 </button>
                             </div>
                         </div>
@@ -217,18 +190,18 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title"><%= lang === 'pt' ? 'Confirmar Exclusão' : 'Confirm Deletion' %></h5>
+                            <h5 class="modal-title"><%= t('common.confirmDeletion') %></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <%= lang === 'pt' ? 'Tem certeza que deseja excluir esta empresa?' : 'Are you sure you want to delete this company?' %>
+                            <%= t('common.confirmDeletionMessage') %>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <%= lang === 'pt' ? 'Cancelar' : 'Cancel' %>
+                                <%= t('common.cancel') %>
                             </button>
                             <button type="button" class="btn btn-danger" onclick="confirmDelete()">
-                                <%= lang === 'pt' ? 'Excluir' : 'Delete' %>
+                                <%= t('common.delete') %>
                             </button>
                         </div>
                     </div>
@@ -240,107 +213,100 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/imask"></script>
     <script>
+        // Variáveis globais
+        let phoneNumberMask;
+        let mobileNumberMask;
+        let postalCodeMask;
+        let companyModal;
+
+        // Inicialização quando o documento estiver pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa as máscaras
+            phoneNumberMask = IMask(document.getElementById('phoneNumber'), {
+                mask: '(00) 0000-0000'
+            });
+            
+            mobileNumberMask = IMask(document.getElementById('mobileNumber'), {
+                mask: '(00) 00000-0000'
+            });
+            
+            postalCodeMask = IMask(document.getElementById('postalCode'), {
+                mask: '00000-000'
+            });
+
+            // Inicializa o modal
+            companyModal = new bootstrap.Modal(document.getElementById('companyModal'));
+
+            // Carrega os estados
+            loadStates();
+        });
+
+        async function loadStates() {
+            try {
+                const response = await fetch('/api/states');
+                const data = await response.json();
+                const stateSelect = document.getElementById('state');
+                
+                // Limpa as opções existentes exceto a primeira (placeholder)
+                while (stateSelect.options.length > 1) {
+                    stateSelect.remove(1);
+                }
+                
+                // Adiciona as novas opções
+                data.states.forEach(state => {
+                    const option = new Option(`${state.code} - ${state.name}`, state.code);
+                    stateSelect.add(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar estados:', error);
+                alert('<%= t('common.errorLoadingStates') %>');
+            }
+        }
+
         // Função para formatar número de telefone
         function formatPhoneNumber(number) {
             if (!number) return '';
-            
-            // Remove tudo que não for número
             const cleaned = number.replace(/\D/g, '');
-            
-            // Verifica se tem a quantidade correta de dígitos
-            if (cleaned.length !== 11) return number;
-            
-            // Formata o número como (XX) XXXXX-XXXX
-            return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
-        }
-
-        let currentCompanyId = null;
-        const companyModal = new bootstrap.Modal(document.getElementById('companyModal'));
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        const defaultHeaders = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        };
-
-        // Configuração da máscara do telefone celular
-        const mobileNumberElement = document.getElementById('mobileNumber');
-        const mobileNumberMask = IMask(mobileNumberElement, {
-            mask: '(00) 00000-0000'
-        });
-
-        // Configuração da máscara do CEP
-        const postalCodeElement = document.getElementById('postalCode');
-        const postalCodeMask = IMask(postalCodeElement, {
-            mask: '00000-000'
-        });
-
-        function openCompanyModal() {
-            currentCompanyId = null;
-            document.getElementById('companyForm').reset();
-            document.getElementById('isActive').checked = true;
-            document.getElementById('modalTitle').textContent = 
-                '<%= lang === "pt" ? "Nova Empresa" : "New Company" %>';
-            companyModal.show();
+            if (cleaned.length === 11) {
+                return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
+            }
+            return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 6)}-${cleaned.substring(6)}`;
         }
 
         async function editCompany(id) {
             try {
-                const response = await fetch(`/api/companies/${id}`, {
-                    headers: defaultHeaders
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || `Erro HTTP! status: ${response.status}`);
-                }
-                
+                const response = await fetch(`/api/companies/${id}`);
                 const company = await response.json();
-                currentCompanyId = company.id;
                 
-                document.getElementById('name').value = company.name;
-                document.getElementById('activity').value = company.activity;
-                document.getElementById('responsible').value = company.responsible;
+                document.getElementById('companyId').value = company.id;
+                document.getElementById('name').value = company.name || '';
+                document.getElementById('activity').value = company.activity || '';
+                document.getElementById('responsible').value = company.responsible || '';
                 document.getElementById('email').value = company.email || '';
-                document.getElementById('phoneNumber').value = company.phoneNumber || '';
                 
-                // Atualiza o valor do campo com a máscara
+                // Atualiza os campos com máscara
+                phoneNumberMask.value = company.phoneNumber || '';
                 mobileNumberMask.value = company.mobileNumber || '';
                 
+                // Campos de endereço
                 document.getElementById('street').value = company.address?.street || '';
                 document.getElementById('number').value = company.address?.number || '';
                 document.getElementById('additionalInfo').value = company.address?.additionalInfo || '';
                 document.getElementById('city').value = company.address?.city || '';
-                
-                // Seleciona o estado correto no select
-                const stateSelect = document.getElementById('state');
-                const stateValue = company.address?.state || '';
-                if (stateValue) {
-                    // Procura a opção com o valor do estado
-                    const option = Array.from(stateSelect.options).find(opt => opt.value === stateValue);
-                    if (option) {
-                        stateSelect.value = stateValue;
-                    } else {
-                        // Se não encontrar o estado na lista, seleciona a opção vazia
-                        stateSelect.value = '';
-                    }
-                } else {
-                    stateSelect.value = '';
-                }
-                
-                // Atualiza o CEP com a máscara
                 postalCodeMask.value = company.address?.postalCode || '';
-                
                 document.getElementById('country').value = company.address?.country || '';
                 document.getElementById('logo').value = company.logo || '';
                 document.getElementById('isActive').checked = company.isActive;
                 
-                document.getElementById('modalTitle').textContent = 
-                    '<%= lang === "pt" ? "Editar Empresa" : "Edit Company" %>';
+                // Carrega os estados e depois seleciona o valor correto
+                await loadStates();
+                document.getElementById('state').value = company.address?.state || '';
                 
+                document.getElementById('modalTitle').textContent = '<%= t('common.edit') %>';
                 companyModal.show();
             } catch (error) {
                 console.error('Erro ao carregar empresa:', error);
-                alert('<%= lang === "pt" ? "Erro ao carregar empresa" : "Error loading company" %>: ' + error.message);
+                alert('<%= t('common.errorLoadingCompany') %>: ' + error.message);
             }
         }
 
@@ -391,8 +357,8 @@
                 companyModal.hide();
                 window.location.reload();
             } catch (error) {
-                console.error('Erro ao salvar empresa:', error);
-                alert('<%= lang === "pt" ? "Erro ao salvar empresa" : "Error saving company" %>: ' + error.message);
+                console.error('Error saving company:', error);
+                alert('<%= t('common.errorSavingCompany') %>: ' + error.message);
             }
         }
 
@@ -417,7 +383,7 @@
                 window.location.reload();
             } catch (error) {
                 console.error('Error deleting company:', error);
-                alert('<%= lang === "pt" ? "Erro ao excluir empresa" : "Error deleting company" %>: ' + error.message);
+                alert('<%= t('common.errorDeletingCompany') %>: ' + error.message);
             }
         }
     </script>

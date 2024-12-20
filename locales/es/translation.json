@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "companies": "Empresas",
+    "services": "Servicios",
+    "schedule": "Agenda",
+    "settings": "Configuración",
+    "logout": "Salir"
+  },
+  "login": {
+    "title": "Login - Sistema de Programación",
+    "phoneLabel": "Código de área + Móvil",
+    "enter": "Entrar",
+    "invalidPhone": "Por favor, ingrese un número de teléfono válido con código de área"
+  },
+  "common": {
+    "welcome": "Bienvenido",
+    "search": "Buscar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "select": "Seleccionar",
+    "actions": "Acciones",
+    "errorLoadingStates": "Error al cargar estados",
+    "errorLoadingCompany": "Error al cargar empresa",
+    "errorSavingCompany": "Error al guardar empresa",
+    "errorDeletingCompany": "Error al eliminar empresa",
+    "confirmDeletion": "Confirmar Eliminación",
+    "confirmDeletionMessage": "¿Está seguro de que desea eliminar esta empresa?"
+  },
+  "companies": {
+    "title": "Empresas",
+    "add": "Agregar Empresa",
+    "name": "Nombre",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "email": "Correo electrónico",
+    "mobile": "Móvil",
+    "activity": "Actividad",
+    "responsible": "Responsable",
+    "street": "Calle",
+    "number": "Número",
+    "additionalInfo": "Información adicional",
+    "city": "Ciudad",
+    "state": "Estado",
+    "postalCode": "Código Postal",
+    "country": "País",
+    "logo": "URL del Logotipo",
+    "isActive": "Activo",
+    "noCompaniesFound": "No se encontraron empresas"
+  }
+}

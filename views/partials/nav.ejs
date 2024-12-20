@@ -8,12 +8,13 @@
         <span></span>
     </button>
     <ul class="nav-links">
-        <li><a href="/agenda" class="<%= path === '/agenda' ? 'active' : '' %>">Agenda</a></li>
-        <li><a href="/empresa" class="<%= path === '/companies' || path === '/empresa' ? 'active' : '' %>">Empresas</a></li>
-        <li><a href="/settings" class="<%= path === '/settings' ? 'active' : '' %>">Configurações</a></li>
-        <li><a href="/logout" class="nav-logout">Sair</a></li>
+        <li><a href="/agenda" class="<%= path === '/agenda' ? 'active' : '' %>"><%= t('nav.schedule') %></a></li>
+        <li><a href="/empresa" class="<%= path === '/companies' || path === '/empresa' ? 'active' : '' %>"><%= t('nav.companies') %></a></li>
+        <li><a href="/settings" class="<%= path === '/settings' ? 'active' : '' %>"><%= t('nav.settings') %></a></li>
+        <li><a href="/logout" class="nav-logout"><%= t('nav.logout') %></a></li>
     </ul>
 </nav>
+
 <script>
     document.querySelector('.hamburger-menu').addEventListener('click', function() {
         this.classList.toggle('active');

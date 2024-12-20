@@ -4,6 +4,12 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fetch = require('node-fetch');
+const i18next = require('i18next');
+const i18nextMiddleware = require('i18next-http-middleware');
+const fs = require('fs').promises;
+
+// Import i18n configuration
+require('./config/i18n');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +24,9 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+
+// i18n middleware
+app.use(i18nextMiddleware.handle(i18next));
 
 // Set logo URL for all views
 app.use((req, res, next) => {
@@ -59,7 +68,31 @@ const formatPhoneNumber = (number) => {
     return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
 };
 
+// Language switcher endpoint
+app.post('/change-language', (req, res) => {
+    const { language } = req.body;
+    if (['pt', 'en', 'es'].includes(language)) {
+        res.cookie('language', language, { maxAge: 365 * 24 * 60 * 60 * 1000 }); // 1 year
+        res.redirect('back');
+    } else {
+        res.status(400).json({ error: 'Invalid language' });
+    }
+});
+
 // API proxy routes
+app.get('/api/states', async (req, res) => {
+    try {
+        const language = req.language || 'pt';
+        const statesPath = path.join(__dirname, `locales/${language}/states.json`);
+        const statesData = await fs.readFile(statesPath, 'utf8');
+        const states = JSON.parse(statesData);
+        res.json(states);
+    } catch (error) {
+        console.error('Error loading states:', error);
+        res.status(500).json({ error: 'Error loading states' });
+    }
+});
+
 app.get('/api/companies', requireAuth, async (req, res) => {
     try {
         const response = await fetch(`${apiBaseUrl}/companies`, {

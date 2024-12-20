@@ -1,0 +1,23 @@
+{
+  "states": [
+    { "code": "AN", "name": "Andalucía" },
+    { "code": "AR", "name": "Aragón" },
+    { "code": "AS", "name": "Principado de Asturias" },
+    { "code": "CN", "name": "Islas Canarias" },
+    { "code": "CB", "name": "Cantabria" },
+    { "code": "CM", "name": "Castilla-La Mancha" },
+    { "code": "CL", "name": "Castilla y León" },
+    { "code": "CT", "name": "Cataluña" },
+    { "code": "CE", "name": "Ceuta" },
+    { "code": "EX", "name": "Extremadura" },
+    { "code": "GA", "name": "Galicia" },
+    { "code": "IB", "name": "Islas Baleares" },
+    { "code": "RI", "name": "La Rioja" },
+    { "code": "MD", "name": "Comunidad de Madrid" },
+    { "code": "ML", "name": "Melilla" },
+    { "code": "MC", "name": "Región de Murcia" },
+    { "code": "NC", "name": "Comunidad Foral de Navarra" },
+    { "code": "PV", "name": "País Vasco" },
+    { "code": "VC", "name": "Comunidad Valenciana" }
+  ]
+}

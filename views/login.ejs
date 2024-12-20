@@ -1,11 +1,56 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="<%= i18n.language %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema de Agendamento</title>
+    <title><%= t('login.title') %></title>
     <link rel="stylesheet" href="/styles.css">
     <script src="https://unpkg.com/imask"></script>
+    <style>
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .language-option {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .language-option input[type="radio"] {
+            display: none;
+        }
+
+        .language-option label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .language-option input[type="radio"]:checked + label {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .language-option label:hover {
+            transform: scale(1.1);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .language-option img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,12 +60,37 @@
             </div>
             <form action="/login" method="POST" class="login-form">
                 <div class="form-group">
-                    <label for="phone">DDD + Celular:</label>
+                    <label for="phone"><%= t('login.phoneLabel') %>:</label>
                     <input type="text" id="phone" name="phone" 
                            placeholder="(00) 00000-0000" 
                            required>
                 </div>
-                <button type="submit" class="btn-primary">Entrar</button>
+
+                <div class="language-selector">
+                    <div class="language-option">
+                        <input type="radio" id="lang-pt" name="language" value="pt" 
+                               <%= i18n.language === 'pt' ? 'checked' : '' %>>
+                        <label for="lang-pt">
+                            <img src="/images/pt-flag.png" alt="Português" title="Português">
+                        </label>
+                    </div>
+                    <div class="language-option">
+                        <input type="radio" id="lang-en" name="language" value="en"
+                               <%= i18n.language === 'en' ? 'checked' : '' %>>
+                        <label for="lang-en">
+                            <img src="/images/en-flag.png" alt="English" title="English">
+                        </label>
+                    </div>
+                    <div class="language-option">
+                        <input type="radio" id="lang-es" name="language" value="es"
+                               <%= i18n.language === 'es' ? 'checked' : '' %>>
+                        <label for="lang-es">
+                            <img src="/images/sp-flag.png" alt="Español" title="Español">
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary"><%= t('login.enter') %></button>
             </form>
         </div>
     </div>
@@ -38,8 +108,25 @@
             const phone = mask.unmaskedValue;
             if (phone.length !== 11) {
                 e.preventDefault();
-                alert('Por favor, insira um número de telefone válido com DDD');
+                alert('<%= t('login.invalidPhone') %>');
             }
+        });
+
+        // Mudança de idioma
+        document.querySelectorAll('.language-option input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                fetch('/change-language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ language: this.value })
+                }).then(() => {
+                    window.location.reload();
+                }).catch(error => {
+                    console.error('Erro ao mudar idioma:', error);
+                });
+            });
         });
     </script>
 </body>
