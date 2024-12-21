@@ -12,6 +12,7 @@ i18next
     preload: ['pt', 'en', 'es'],
     ns: ['translation'],
     defaultNS: 'translation',
+    returnObjects: true,
     backend: {
       loadPath: path.join(__dirname, '../locales/{{lng}}/{{ns}}.json'),
     },

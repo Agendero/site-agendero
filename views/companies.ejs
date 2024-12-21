@@ -191,13 +191,14 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label class="form-label"><%= t('companies.city') %></label>
-                                        <input type="text" class="form-control" id="city">
+                                        <label class="form-label"><%= t('companies.country') %></label>
+                                        <div class="form-control-plaintext" id="countryTitle"><%= t('county.title') %></div>
+                                        <input type="hidden" id="country" value="<%= t('county.id') %>">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label"><%= t('companies.state') %></label>
                                         <select class="form-select" id="state">
-                                            <option value=""><%= t('common.select') %></option>
+                                            <option value=""><%= t('companies.selectState') %></option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -205,15 +206,10 @@
                                         <input type="text" class="form-control" id="postalCode">
                                     </div>
                                 </div>
-                               
                                 <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label w-100"><%= t('companies.country') %></label>
-                                        <input type="text" class="form-control w-100" id="country">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label w-100"><%= t('companies.logo') %></label>
-                                        <input type="text" class="form-control w-100 h-50" id="logo">
+                                    <div class="col-md-8">
+                                        <label class="form-label"><%= t('companies.logo') %></label>
+                                        <input type="text" class="form-control" id="logo">
                                     </div>
                                 </div>
 
@@ -271,6 +267,7 @@
         let postalCodeMask;
         let companyModal;
         let deleteModal;
+        let currentCompanyId;
 
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Bootstrap modals
@@ -282,7 +279,39 @@
 
             // Initialize masks
             initializeMasks();
+
+            // Load states on page load
+            loadStates();
         });
+
+        function loadStates() {
+            try {
+                const stateSelect = document.getElementById('state');
+                
+                // Reset state select
+                stateSelect.innerHTML = `<option value=""><%= t('companies.selectState') %></option>`;
+
+                // Get states directly from the translation object
+                const states = {
+                    <%- Object.entries(t('county.states')).map(([code, name]) => `"${code}": "${name}"`).join(',\n                    ') %>
+                };
+                
+                console.log('States:', states);
+                
+                // Add states to select in alphabetical order
+                Object.entries(states)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .forEach(([code, name]) => {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.textContent = name;
+                        stateSelect.appendChild(option);
+                    });
+            } catch (error) {
+                console.error('Error loading states:', error);
+                alert('<%= t('common.errorLoadingStates') %>');
+            }
+        }
 
         function openCompanyModal() {
             clearForm();
@@ -294,6 +323,7 @@
         function clearForm() {
             document.getElementById('companyForm').reset();
             document.getElementById('companyId').value = '';
+            loadStates();
             initializeMasks();
         }
 
@@ -320,6 +350,7 @@
                 document.getElementById('city').value = company.city || '';
                 document.getElementById('state').value = company.state || '';
                 document.getElementById('postalCode').value = company.postalCode || '';
+                document.getElementById('logo').value = company.logo || '';
                 
                 document.getElementById('modalTitle').textContent = '<%= t('companies.edit') %>';
                 
@@ -346,28 +377,6 @@
             postalCodeMask = IMask(document.getElementById('postalCode'), {
                 mask: '00000-000'
             });
-        }
-
-        async function loadStates() {
-            try {
-                const response = await fetch('/api/states');
-                const data = await response.json();
-                const stateSelect = document.getElementById('state');
-                
-                // Limpa as opções existentes exceto a primeira (placeholder)
-                while (stateSelect.options.length > 1) {
-                    stateSelect.remove(1);
-                }
-                
-                // Adiciona as novas opções
-                data.states.forEach(state => {
-                    const option = new Option(`${state.code} - ${state.name}`, state.code);
-                    stateSelect.add(option);
-                });
-            } catch (error) {
-                console.error('Erro ao carregar estados:', error);
-                alert('<%= t('common.errorLoadingStates') %>');
-            }
         }
 
         async function saveCompany() {
