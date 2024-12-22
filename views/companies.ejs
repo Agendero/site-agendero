@@ -330,29 +330,55 @@
         async function editCompany(id) {
             try {
                 currentCompanyId = id;
-                const response = await fetch(`/api/companies/${id}`);
+                const response = await fetch(`/api/companies/${id}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 if (!response.ok) {
                     throw new Error('Failed to fetch company data');
                 }
+                
                 const company = await response.json();
+                console.log('Company data:', company);
+
+                // Helper function to safely set form field values
+                const setFieldValue = (fieldId, value) => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        if (field.type === 'checkbox') {
+                            field.checked = value !== false;
+                        } else {
+                            field.value = value || '';
+                        }
+                    } else {
+                        console.warn(`Field ${fieldId} not found`);
+                    }
+                };
                 
                 // Fill form fields
-                document.getElementById('companyId').value = company.id;
-                document.getElementById('name').value = company.name || '';
-                document.getElementById('activity').value = company.activity || '';
-                document.getElementById('responsible').value = company.responsible || '';
-                document.getElementById('email').value = company.email || '';
-                document.getElementById('phoneNumber').value = company.phoneNumber || '';
-                document.getElementById('mobileNumber').value = company.mobileNumber || '';
-                document.getElementById('street').value = company.street || '';
-                document.getElementById('number').value = company.number || '';
-                document.getElementById('additionalInfo').value = company.additionalInfo || '';
-                document.getElementById('city').value = company.city || '';
-                document.getElementById('state').value = company.state || '';
-                document.getElementById('postalCode').value = company.postalCode || '';
-                document.getElementById('logo').value = company.logo || '';
+                setFieldValue('companyId', company.id);
+                setFieldValue('name', company.name);
+                setFieldValue('activity', company.activity);
+                setFieldValue('responsible', company.responsible);
+                setFieldValue('email', company.email);
+                setFieldValue('phoneNumber', company.phoneNumber);
+                setFieldValue('mobileNumber', company.mobileNumber);
+                setFieldValue('street', company.address?.street);
+                setFieldValue('number', company.address?.number);
+                setFieldValue('additionalInfo', company.address?.additionalInfo);
+                setFieldValue('city', company.address?.city);
+                setFieldValue('state', company.address?.state);
+                setFieldValue('postalCode', company.address?.postalCode);
+                setFieldValue('country', company.address?.country);
+                setFieldValue('logo', company.logo);
+                setFieldValue('isActive', company.isActive);
                 
-                document.getElementById('modalTitle').textContent = '<%= t('companies.edit') %>';
+                const modalTitle = document.getElementById('modalTitle');
+                if (modalTitle) {
+                    modalTitle.textContent = '<%= t('companies.edit') %>';
+                }
                 
                 // Reinitialize masks after filling the form
                 initializeMasks();
