@@ -69,21 +69,21 @@
                 <div class="language-selector">
                     <div class="language-option">
                         <input type="radio" id="lang-pt" name="language" value="pt" 
-                               <%= i18n.language === 'pt' ? 'checked' : '' %>>
+                               <%= i18n.language === 'pt' ? 'checked' : '' %> >
                         <label for="lang-pt">
                             <img src="/images/pt-flag.png" alt="Português" title="Português">
                         </label>
                     </div>
                     <div class="language-option">
                         <input type="radio" id="lang-en" name="language" value="en"
-                               <%= i18n.language === 'en' ? 'checked' : '' %>>
+                               <%= i18n.language === 'en' ? 'checked' : '' %> >
                         <label for="lang-en">
                             <img src="/images/en-flag.png" alt="English" title="English">
                         </label>
                     </div>
                     <div class="language-option">
                         <input type="radio" id="lang-es" name="language" value="es"
-                               <%= i18n.language === 'es' ? 'checked' : '' %>>
+                               <%= i18n.language === 'es' ? 'checked' : '' %> >
                         <label for="lang-es">
                             <img src="/images/sp-flag.png" alt="Español" title="Español">
                         </label>
@@ -96,17 +96,71 @@
     </div>
 
     <script>
-        // Aplicar máscara ao campo de telefone
-        const phoneInput = document.getElementById('phone');
-        const maskOptions = {
-            mask: '(00) 00000-0000'
+        // Definição das máscaras por país
+        const phoneMasks = {
+            'pt': {
+                mask: '(00) 00000-0000',
+                validation: value => value.length === 11,
+                minLength: 11
+            },
+            'en': {
+                mask: '+1 (000) 000-0000',
+                validation: value => value.length === 10,
+                minLength: 10
+            },
+            'es': {
+                mask: '+34 000 000 000',
+                validation: value => value.length === 9,
+                minLength: 9
+            }
         };
-        const mask = IMask(phoneInput, maskOptions);
+
+        // Função para atualizar a máscara do telefone
+        function updatePhoneMask(language) {
+            const phoneInput = document.getElementById('phone');
+            const currentMask = phoneMasks[language] || phoneMasks['pt'];
+            
+            // Destruir máscara anterior se existir
+            if (phoneInput.masked) {
+                phoneInput.masked.destroy();
+            }
+
+            // Aplicar nova máscara
+            const mask = IMask(phoneInput, {
+                mask: currentMask.mask,
+                lazy: false
+            });
+
+            // Atualizar placeholder
+            phoneInput.placeholder = currentMask.mask.replace(/0/g, '_');
+        }
+
+        // Inicializar máscara baseada no idioma atual
+        updatePhoneMask('<%= i18n.language %>');
 
         // Validação do formulário
         document.querySelector('.login-form').addEventListener('submit', function(e) {
-            const phone = mask.unmaskedValue;
-            if (phone.length !== 11) {
+            const phoneInput = document.getElementById('phone');
+            const currentLanguage = document.querySelector('input[name="language"]:checked').value;
+            const currentMask = phoneMasks[currentLanguage] || phoneMasks['pt'];
+            
+            // Remove todos os caracteres não numéricos, exceto o último dígito para validação
+            const phoneDigits = phoneInput.value.replace(/[^0-9]/g, '');
+            
+            // Ajusta a validação baseada no país
+            let isValid = false;
+            if (currentLanguage === 'en') {
+                // Para EUA, queremos os últimos 10 dígitos
+                isValid = phoneDigits.length >= currentMask.minLength;
+            } else if (currentLanguage === 'es') {
+                // Para Espanha, queremos os últimos 9 dígitos
+                isValid = phoneDigits.length >= currentMask.minLength;
+            } else {
+                // Para Brasil, mantemos a validação original
+                isValid = phoneDigits.length === currentMask.minLength;
+            }
+
+            if (!isValid) {
                 e.preventDefault();
                 alert('<%= t('login.invalidPhone') %>');
             }
@@ -115,6 +169,7 @@
         // Mudança de idioma
         document.querySelectorAll('.language-option input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', function() {
+                updatePhoneMask(this.value);
                 fetch('/change-language', {
                     method: 'POST',
                     headers: {
