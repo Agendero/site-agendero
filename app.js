@@ -236,6 +236,136 @@ app.delete('/api/companies/:id', requireAuth, async (req, res) => {
     }
 });
 
+// Specialties Page Route
+app.get('/especialidades', requireAuth, async (req, res) => {
+    try {
+        const response = await fetch(`${apiBaseUrl}/specialties`, {
+            headers: getApiHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+
+        const specialties = await response.json();
+        
+        res.render('specialties', { 
+            user: req.session.user,
+            specialties: specialties,
+            path: '/especialidades'
+        });
+    } catch (error) {
+        console.error('Error fetching specialties:', error);
+        res.render('specialties', { 
+            user: req.session.user,
+            specialties: [],
+            path: '/especialidades',
+            error: `Failed to fetch specialties: ${error.message}`
+        });
+    }
+});
+
+// Specialties API Routes
+app.get('/api/specialties', requireAuth, async (req, res) => {
+    try {
+        const response = await fetch(`${apiBaseUrl}/specialties`, {
+            headers: getApiHeaders()
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching specialties:', error);
+        res.status(500).json({ error: 'Failed to fetch specialties', details: error.message });
+    }
+});
+
+app.get('/api/specialties/:id', requireAuth, async (req, res) => {
+    try {
+        const response = await fetch(`${apiBaseUrl}/specialties/${req.params.id}`, {
+            headers: getApiHeaders()
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching specialty:', error);
+        res.status(500).json({ error: 'Failed to fetch specialty', details: error.message });
+    }
+});
+
+app.post('/api/specialties', requireAuth, async (req, res) => {
+    try {
+        const response = await fetch(`${apiBaseUrl}/specialties`, {
+            method: 'POST',
+            headers: getApiHeaders(),
+            body: JSON.stringify(req.body)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error creating specialty:', error);
+        res.status(500).json({ error: 'Failed to create specialty', details: error.message });
+    }
+});
+
+app.put('/api/specialties/:id', requireAuth, async (req, res) => {
+    try {
+        const response = await fetch(`${apiBaseUrl}/specialties/${req.params.id}`, {
+            method: 'PUT',
+            headers: getApiHeaders(),
+            body: JSON.stringify(req.body)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error updating specialty:', error);
+        res.status(500).json({ error: 'Failed to update specialty', details: error.message });
+    }
+});
+
+app.delete('/api/specialties/:id', requireAuth, async (req, res) => {
+    try {
+        const response = await fetch(`${apiBaseUrl}/specialties/${req.params.id}`, {
+            method: 'DELETE',
+            headers: getApiHeaders()
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error deleting specialty:', error);
+        res.status(500).json({ error: 'Failed to delete specialty', details: error.message });
+    }
+});
+
 // Routes
 app.get('/', (req, res) => {
     res.render('login', { 

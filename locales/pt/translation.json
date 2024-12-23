@@ -2,6 +2,7 @@
   "nav": {
     "home": "Início",
     "companies": "Empresas",
+    "specialties": "Especialidades",
     "services": "Serviços",
     "schedule": "Agenda",
     "settings": "Configurações",
@@ -25,7 +26,9 @@
     "actions": "Ações",
     "confirmDelete": "Tem certeza que deseja excluir?",
     "errorOccurred": "Ocorreu um erro",
-    "errorLoadingStates": "Erro ao carregar estados"
+    "errorLoadingStates": "Erro ao carregar estados",
+    "errorSavingSpecialty": "Erro ao salvar especialidade",
+    "errorDeletingSpecialty": "Erro ao excluir especialidade"
   },
   "companies": {
     "title": "Empresas",
@@ -50,6 +53,15 @@
     "noCompaniesFound": "Nenhuma empresa encontrada",
     "selectCountry": "Selecione o País",
     "selectState": "Selecione o Estado"
+  },
+  "specialties": {
+    "title": "Especialidades",
+    "add": "Adicionar Especialidade",
+    "edit": "Editar Especialidade",
+    "name": "Nome",
+    "description": "Descrição",
+    "noSpecialtiesFound": "Nenhuma especialidade encontrada",
+    "deleteConfirmation": "Tem certeza que deseja excluir esta especialidade?"
   },
   "schedule": {
     "title": "Agenda",
