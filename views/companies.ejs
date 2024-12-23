@@ -173,7 +173,7 @@
                                         <input type="tel" class="form-control" id="mobileNumber">
                                     </div>
                                 </div>
-                                
+                                 
                                 <h5 class="mb-3"><%= t('companies.address') %></h5>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
@@ -206,10 +206,10 @@
                                         <input type="text" class="form-control" id="postalCode">
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-8">
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
                                         <label class="form-label"><%= t('companies.logo') %></label>
-                                        <input type="text" class="form-control" id="logo">
+                                        <input type="text" class="form-control" id="logoUrl">
                                     </div>
                                 </div>
 
@@ -392,40 +392,50 @@
         }
 
         function initializeMasks() {
-            phoneNumberMask = IMask(document.getElementById('phoneNumber'), {
-                mask: '(00) 0000-0000'
-            });
-            
-            mobileNumberMask = IMask(document.getElementById('mobileNumber'), {
-                mask: '(00) 00000-0000'
-            });
-            
-            postalCodeMask = IMask(document.getElementById('postalCode'), {
-                mask: '00000-000'
-            });
+            const phoneInput = document.getElementById('phoneNumber');
+            const mobileInput = document.getElementById('mobileNumber');
+            const postalInput = document.getElementById('postalCode');
+
+            if (phoneInput) {
+                phoneNumberMask = IMask(phoneInput, {
+                    mask: '(00) 0000-0000'
+                });
+            }
+
+            if (mobileInput) {
+                mobileNumberMask = IMask(mobileInput, {
+                    mask: '(00) 00000-0000'
+                });
+            }
+
+            if (postalInput) {
+                postalCodeMask = IMask(postalInput, {
+                    mask: '00000-000'
+                });
+            }
         }
 
         async function saveCompany() {
             try {
                 // Prepara os dados do formulário
                 const formData = {
-                    name: document.getElementById('name').value,
-                    activity: document.getElementById('activity').value,
-                    responsible: document.getElementById('responsible').value,
-                    email: document.getElementById('email').value,
-                    phoneNumber: phoneNumberMask.unmaskedValue,
-                    mobileNumber: mobileNumberMask.unmaskedValue,
+                    name: document.getElementById('name')?.value || '',
+                    activity: document.getElementById('activity')?.value || '',
+                    responsible: document.getElementById('responsible')?.value || '',
+                    email: document.getElementById('email')?.value || '',
+                    phoneNumber: phoneNumberMask?.unmaskedValue || '',
+                    mobileNumber: mobileNumberMask?.unmaskedValue || '',
                     address: {
-                        street: document.getElementById('street').value,
-                        number: document.getElementById('number').value,
-                        additionalInfo: document.getElementById('additionalInfo').value,
-                        city: document.getElementById('city').value,
-                        state: document.getElementById('state').value,
-                        postalCode: postalCodeMask.unmaskedValue,
-                        country: document.getElementById('country').value
+                        street: document.getElementById('street')?.value || '',
+                        number: document.getElementById('number')?.value || '',
+                        additionalInfo: document.getElementById('additionalInfo')?.value || '',
+                        city: document.getElementById('city')?.value || '',
+                        state: document.getElementById('state')?.value || '',
+                        postalCode: postalCodeMask?.unmaskedValue || '',
+                        country: document.getElementById('country')?.value || ''
                     },
-                    logo: document.getElementById('logo').value,
-                    isActive: document.getElementById('isActive').checked
+                    logo: document.getElementById('logoUrl')?.value || '',
+                    isActive: document.getElementById('isActive')?.checked || false
                 };
 
                 const url = currentCompanyId ? 
