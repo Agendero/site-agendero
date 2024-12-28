@@ -3,13 +3,21 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const fetch = require('node-fetch');
 const i18next = require('i18next');
 const i18nextMiddleware = require('i18next-http-middleware');
+const fetch = require('node-fetch');
 const fs = require('fs').promises;
 
 // Import i18n configuration
 require('./config/i18n');
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const companiesRoutes = require('./routes/companies');
+const attendantsRoutes = require('./routes/attendants');
+const specialtiesRoutes = require('./routes/specialties');
+const statesRoutes = require('./routes/states');
+const agendaRoutes = require('./routes/agenda');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -68,175 +76,23 @@ const formatPhoneNumber = (number) => {
     return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
 };
 
-// Language switcher endpoint
-app.post('/change-language', (req, res) => {
-    const { language } = req.body;
-    if (['pt', 'en', 'es'].includes(language)) {
-        res.cookie('language', language, { maxAge: 365 * 24 * 60 * 60 * 1000 }); // 1 year
-        res.redirect('back');
-    } else {
-        res.status(400).json({ error: 'Invalid language' });
-    }
+// Apply routes
+app.use('/', authRoutes);
+app.use('/api/companies', requireAuth, companiesRoutes);
+app.use('/api/attendants', requireAuth, attendantsRoutes);
+app.use('/api/specialties', requireAuth, specialtiesRoutes);
+app.use('/api/states', statesRoutes);
+app.use('/agenda', requireAuth, agendaRoutes);
+
+// Settings page route
+app.get('/settings', requireAuth, (req, res) => {
+    res.render('settings', { 
+        user: req.session.user,
+        path: '/settings'
+    });
 });
 
-// API proxy routes
-app.get('/api/states', async (req, res) => {
-    try {
-        const language = req.language || 'pt';
-        const statesPath = path.join(__dirname, `locales/${language}/states.json`);
-        const statesData = await fs.readFile(statesPath, 'utf8');
-        const states = JSON.parse(statesData);
-        res.json(states);
-    } catch (error) {
-        console.error('Error loading states:', error);
-        res.status(500).json({ error: 'Error loading states' });
-    }
-});
-
-app.get('/api/companies', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies`, {
-            headers: getApiHeaders()
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API responded with status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error fetching companies:', error);
-        res.status(500).json({ error: 'Failed to fetch companies', details: error.message });
-    }
-});
-
-app.get('/api/companies/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
-            headers: getApiHeaders()
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error fetching company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to fetch company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-app.post('/api/companies', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies`, {
-            method: 'POST',
-            headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error creating company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to create company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-app.put('/api/companies/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
-            method: 'PUT',
-            headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error updating company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to update company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-app.delete('/api/companies/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
-            method: 'DELETE',
-            headers: getApiHeaders()
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error deleting company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to delete company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-// Specialties Page Route
+// Specialties page route
 app.get('/especialidades', requireAuth, async (req, res) => {
     try {
         const response = await fetch(`${apiBaseUrl}/specialties`, {
@@ -265,318 +121,76 @@ app.get('/especialidades', requireAuth, async (req, res) => {
     }
 });
 
-// Specialties API Routes
-app.get('/api/specialties', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/specialties`, {
-            headers: getApiHeaders()
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error fetching specialties:', error);
-        res.status(500).json({ error: 'Failed to fetch specialties', details: error.message });
-    }
-});
-
-app.get('/api/specialties/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/specialties/${req.params.id}`, {
-            headers: getApiHeaders()
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error fetching specialty:', error);
-        res.status(500).json({ error: 'Failed to fetch specialty', details: error.message });
-    }
-});
-
-app.post('/api/specialties', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/specialties`, {
-            method: 'POST',
-            headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error creating specialty:', error);
-        res.status(500).json({ error: 'Failed to create specialty', details: error.message });
-    }
-});
-
-app.put('/api/specialties/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/specialties/${req.params.id}`, {
-            method: 'PUT',
-            headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error updating specialty:', error);
-        res.status(500).json({ error: 'Failed to update specialty', details: error.message });
-    }
-});
-
-app.delete('/api/specialties/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/specialties/${req.params.id}`, {
-            method: 'DELETE',
-            headers: getApiHeaders()
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error deleting specialty:', error);
-        res.status(500).json({ error: 'Failed to delete specialty', details: error.message });
-    }
-});
-
-// Routes
-app.get('/', (req, res) => {
-    res.render('login', { 
-        path: '/',
-        logoUrl: res.locals.logoUrl 
-    });
-});
-
-app.post('/login', (req, res) => {
-    const { phone } = req.body;
-    // Remove todos os caracteres não numéricos
-    const cleanPhone = phone.replace(/\D/g, '');
-    
-    if (cleanPhone && cleanPhone.length === 11) {
-        req.session.user = { 
-            phone: cleanPhone,
-            formattedPhone: formatPhoneNumber(phone) 
-        };
-        res.redirect('/agenda');
+// Language switcher endpoint
+app.post('/change-language', (req, res) => {
+    const { language } = req.body;
+    if (['pt', 'en', 'es'].includes(language)) {
+        res.cookie('language', language, { maxAge: 365 * 24 * 60 * 60 * 1000 }); // 1 year
+        res.redirect('back');
     } else {
-        res.redirect('/');
+        res.status(400).json({ error: 'Invalid language' });
     }
 });
 
-app.get('/agenda', requireAuth, (req, res) => {
-    res.render('agenda', { 
-        user: req.session.user,
-        path: '/agenda'
-    });
-});
-
-app.get('/settings', requireAuth, (req, res) => {
-    res.render('settings', { 
-        user: req.session.user,
-        path: '/settings'
-    });
-});
-
-app.get('/companies', requireAuth, async (req, res) => {
+// Companies page route
+app.get('/empresas', requireAuth, async (req, res) => {
     try {
-        const lang = req.query.lang || 'pt';
-        // Garantindo que não há barras duplicadas
-        const baseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
-        const url = `${baseUrl}/companies`;
-                
-        const headers = getApiHeaders();
-        const apiResponse = await fetch(url, {
-            headers: headers
+        const response = await fetch(`${apiBaseUrl}/companies`, {
+            headers: getApiHeaders()
         });
 
-        if (!apiResponse.ok) {
-            const errorText = await apiResponse.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${apiResponse.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${apiResponse.status}. Response: ${errorText}`);
-            }
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
         }
 
-        const companies = await apiResponse.json();
-
+        const companies = await response.json();
         res.render('companies', { 
             user: req.session.user,
             companies: companies,
-            lang: lang,
-            formatPhoneNumber: formatPhoneNumber,
-            path: '/companies'
+            path: '/empresas',
+            formatPhoneNumber: formatPhoneNumber
         });
     } catch (error) {
         console.error('Error fetching companies:', error);
-        console.error('Stack trace:', error.stack);
         res.render('companies', { 
             user: req.session.user,
             companies: [],
-            lang: req.query.lang || 'pt',
-            formatPhoneNumber: formatPhoneNumber,
-            path: '/companies',
-            error: `Failed to fetch companies: ${error.message}`
+            path: '/empresas',
+            error: 'Failed to fetch companies',
+            formatPhoneNumber: formatPhoneNumber
         });
     }
 });
 
-app.get('/empresa', requireAuth, (req, res) => {
-    res.redirect('/companies?lang=pt');
+app.get('/empresa', requireAuth, async (req, res) => {
+    res.render('companies', { path: '/empresa' });
 });
 
-// Companies API Routes
-app.get('/api/companies/:id', requireAuth, async (req, res) => {
+// Route to attendants page
+app.get('/atendentes', requireAuth, async (req, res) => {
     try {
-        const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
-            headers: getApiHeaders()
+        const response = await fetch(`${process.env.URL_API}/attendants`, {
+            headers: {
+                'x-api-key-admin': process.env.Authentication__ApiKey,
+                'Accept': 'application/json'
+            }
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                console.error('Parsed API Error:', jsonError);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        res.json(data);
+        const attendants = await response.json();
+        res.render('attendants', { 
+            path: '/atendentes',
+            attendants: attendants 
+        });
     } catch (error) {
-        console.error('Error fetching company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to fetch company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-app.post('/api/companies', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies`, {
-            method: 'POST',
-            headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error creating company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to create company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-app.put('/api/companies/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
-            method: 'PUT',
-            headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error updating company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to update company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
-});
-
-app.delete('/api/companies/:id', requireAuth, async (req, res) => {
-    try {
-        const response = await fetch(`${apiBaseUrl}/companies/${req.params.id}`, {
-            method: 'DELETE',
-            headers: getApiHeaders()
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            try {
-                const jsonError = JSON.parse(errorText);
-                throw new Error(jsonError.message || `API responded with status: ${response.status}`);
-            } catch (e) {
-                throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
-            }
-        }
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error deleting company:', error);
-        console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            error: 'Failed to delete company', 
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        console.error('Error fetching attendants:', error);
+        res.render('attendants', { 
+            path: '/atendentes',
+            attendants: [],
+            error: 'Error fetching attendants data'
         });
     }
 });

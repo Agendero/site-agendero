@@ -6,7 +6,8 @@
     "services": "Serviços",
     "schedule": "Agenda",
     "settings": "Configurações",
-    "logout": "Sair"
+    "logout": "Sair",
+    "attendants": "Atendentes"
   },
   "login": {
     "title": "Login",
@@ -24,6 +25,8 @@
     "save": "Salvar",
     "select": "Selecione",
     "actions": "Ações",
+    "confirmDeletion": "Confirmar Exclusão",
+    "confirmDeletionMessage": "Tem certeza que deseja excluir?",
     "confirmDelete": "Tem certeza que deseja excluir?",
     "errorOccurred": "Ocorreu um erro",
     "errorLoadingStates": "Erro ao carregar estados",
@@ -69,6 +72,26 @@
     "selectTime": "Selecione o Horário",
     "selectService": "Selecione o Serviço",
     "confirm": "Confirmar Agendamento"
+  },
+  "attendants": {
+    "title": "Atendentes",
+    "add": "Adicionar Atendente",
+    "edit": "Editar Atendente",
+    "name": "Nome",
+    "specialty": "Especialidade",
+    "company": "Empresa",
+    "email": "Email",
+    "mobile": "Celular",
+    "hiringDate": "Data de Contratação",
+    "isAdmin": "Administrador",
+    "noAttendantsFound": "Nenhum atendente encontrado",
+    "nameRequired": "Nome é obrigatório",
+    "emailRequired": "Email é obrigatório",
+    "specialtyRequired": "Especialidade é obrigatória",
+    "companyRequired": "Empresa é obrigatória",
+    "mobileRequired": "Celular é obrigatório",
+    "hiringDateRequired": "Data de contratação é obrigatória",
+    "deleteConfirmation": "Tem certeza que deseja excluir este atendente?"
   },
   "county": {
     "title": "Brasil",

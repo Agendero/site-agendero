@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="<%= i18n.language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= t('attendants.title') %></title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <style>
+        .app-container {
+            min-height: 100vh;
+            background-image: url('/images/fundo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .main-nav, .main-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal fixes */
+        .modal-backdrop {
+            display: none;
+        }
+
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-dialog {
+            margin: 1.75rem auto;
+            max-width: 800px;
+        }
+
+        .modal.show {
+            display: block;
+            padding-right: 17px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <%- include('partials/nav') %>
+        
+        <main class="main-content">
+            <div class="attendants-container">
+                <div class="row">
+                    <div class="col-md-10 justify-content-between align-items-center tituloPage">
+                        <%= t('attendants.title') %>                    
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-end">
+                        <button class="btn btn-primary btn-sm" onclick="openAttendantModal()">
+                            <i class="bi bi-plus-lg"></i> <%= t('attendants.add') %>
+                        </button>
+                    </div>  
+                </div>
+                <br>
+
+                <% if (typeof error !== 'undefined') { %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= error %>
+                    </div>
+                <% } %>
+
+                <div class="table-responsive">
+                    <% if (!attendants || attendants.length === 0) { %>
+                        <div class="alert alert-info">
+                            <%= t('attendants.noAttendantsFound') %>
+                        </div>
+                    <% } else { %>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th><%= t('attendants.name') %></th>
+                                    <th><%= t('attendants.specialty') %></th>
+                                    <th><%= t('attendants.company') %></th>
+                                    <th><%= t('attendants.email') %></th>
+                                    <th><%= t('attendants.mobile') %></th>
+                                    <th><%= t('attendants.hiringDate') %></th>
+                                    <th><%= t('attendants.isAdmin') %></th>
+                                    <th style="width: 150px;"><%= t('common.actions') %></th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendantsTableBody">
+                                <% attendants.forEach(function(attendant) { %>
+                                    <tr>
+                                        <td data-label="<%= t('attendants.name') %>"><%= attendant.Name || '-' %></td>
+                                        <td data-label="<%= t('attendants.specialty') %>"><%= attendant.SpecialtyName || '-' %></td>
+                                        <td data-label="<%= t('attendants.company') %>"><%= attendant.CompanyName || '-' %></td>
+                                        <td data-label="<%= t('attendants.email') %>"><%= attendant.Email || '-' %></td>
+                                        <td data-label="<%= t('attendants.mobile') %>"><%= attendant.MobileNumber ? formatPhoneNumber(attendant.MobileNumber) : '-' %></td>
+                                        <td data-label="<%= t('attendants.hiringDate') %>"><%= attendant.HiringDate ? new Date(attendant.HiringDate).toLocaleDateString() : '-' %></td>
+                                        <td data-label="<%= t('attendants.isAdmin') %>">
+                                            <i class="bi <%= attendant.IsAdmin ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger' %>"></i>
+                                        </td>
+                                        <td data-label="<%= t('common.actions') %>">
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <button class="btn btn-sm btn-primary w-100" onclick="editAttendant('<%= attendant.Id %>')" title="<%= t('common.edit') %>">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-6">
+                                                    <button class="btn btn-sm btn-danger w-100" onclick="deleteAttendant('<%= attendant.Id %>')" title="<%= t('common.delete') %>">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Modal for Create/Edit -->
+            <div class="modal fade" id="attendantModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTitle"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="attendantForm">
+                                <input type="hidden" id="attendantId">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label"><%= t('attendants.name') %> *</label>
+                                        <input type="text" class="form-control" id="name" required maxlength="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><%= t('attendants.email') %> *</label>
+                                        <input type="email" class="form-control" id="email" required maxlength="255">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label"><%= t('attendants.specialty') %> *</label>
+                                        <select class="form-select" id="specialtyId" required>
+                                            <option value=""><%= t('common.select') %></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><%= t('attendants.company') %> *</label>
+                                        <select class="form-select" id="companyId" required>
+                                            <option value=""><%= t('common.select') %></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label"><%= t('attendants.mobile') %> *</label>
+                                        <input type="tel" class="form-control" id="mobileNumber" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><%= t('attendants.hiringDate') %> *</label>
+                                        <input type="date" class="form-control" id="hiringDate" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="isAdmin">
+                                            <label class="form-check-label" for="isAdmin">
+                                                <%= t('attendants.isAdmin') %>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <%= t('common.cancel') %>
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="saveAttendant()">
+                                    <%= t('common.save') %>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><%= t('common.confirmDelete') %></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <%= t('attendants.deleteConfirmation') %>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <%= t('common.cancel') %>
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                                    <%= t('common.delete') %>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/imask"></script>
+    <script>
+        // Global variables
+        let attendantModal;
+        let deleteModal;
+        let currentAttendantId;
+        let mobileNumberMask;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap modals
+            attendantModal = new bootstrap.Modal(document.getElementById('attendantModal'));
+            deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+            // Initialize IMask for phone number
+            mobileNumberMask = IMask(document.getElementById('mobileNumber'), {
+                mask: '(00) 00000-0000'
+            });
+
+            // Load specialties and companies
+            loadSpecialties();
+            loadCompanies();
+        });
+
+        async function loadSpecialties() {
+            try {
+                const response = await fetch('/api/specialties');
+                if (!response.ok) throw new Error('Failed to fetch specialties');
+                
+                const specialties = await response.json();
+                const select = document.getElementById('specialtyId');
+                
+                specialties.forEach(specialty => {
+                    const option = document.createElement('option');
+                    option.value = specialty.Id;
+                    option.textContent = specialty.Name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading specialties:', error);
+            }
+        }
+
+        async function loadCompanies() {
+            try {
+                const response = await fetch('/api/companies');
+                if (!response.ok) throw new Error('Failed to fetch companies');
+                
+                const companies = await response.json();
+                const select = document.getElementById('companyId');
+                
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.id;
+                    option.textContent = company.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading companies:', error);
+            }
+        }
+
+        function openAttendantModal() {
+            clearForm();
+            document.getElementById('modalTitle').textContent = '<%= t('attendants.add') %>';
+            document.getElementById('attendantId').value = '';
+            document.getElementById('hiringDate').valueAsDate = new Date();
+            attendantModal.show();
+        }
+
+        function clearForm() {
+            document.getElementById('attendantForm').reset();
+            document.getElementById('attendantId').value = '';
+            mobileNumberMask.value = '';
+        }
+
+        async function editAttendant(id) {
+            try {
+                currentAttendantId = id;
+                const response = await fetch(`/api/attendants/${id}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch attendant data');
+                }
+                
+                const attendant = await response.json();
+                
+                // Fill form fields
+                document.getElementById('attendantId').value = attendant.Id;
+                document.getElementById('name').value = attendant.Name || '';
+                document.getElementById('email').value = attendant.Email || '';
+                document.getElementById('specialtyId').value = attendant.SpecialtyId || '';
+                document.getElementById('companyId').value = attendant.CompanyId || '';
+                mobileNumberMask.value = attendant.MobileNumber || '';
+                document.getElementById('hiringDate').value = attendant.HiringDate ? new Date(attendant.HiringDate).toISOString().split('T')[0] : '';
+                document.getElementById('isAdmin').checked = attendant.IsAdmin;
+                
+                document.getElementById('modalTitle').textContent = '<%= t('attendants.edit') %>';
+                attendantModal.show();
+            } catch (error) {
+                console.error('Error fetching attendant:', error);
+                alert('<%= t('common.errorOccurred') %>');
+            }
+        }
+
+        async function saveAttendant() {
+            try {
+                const formData = {
+                    Name: document.getElementById('name').value.trim(),
+                    Email: document.getElementById('email').value.trim(),
+                    SpecialtyId: document.getElementById('specialtyId').value,
+                    CompanyId: document.getElementById('companyId').value,
+                    MobileNumber: mobileNumberMask.unmaskedValue,
+                    HiringDate: document.getElementById('hiringDate').value,
+                    IsAdmin: document.getElementById('isAdmin').checked
+                };
+
+                // Validate required fields
+                if (!formData.Name) throw new Error('<%= t('attendants.nameRequired') %>');
+                if (!formData.Email) throw new Error('<%= t('attendants.emailRequired') %>');
+                if (!formData.SpecialtyId) throw new Error('<%= t('attendants.specialtyRequired') %>');
+                if (!formData.CompanyId) throw new Error('<%= t('attendants.companyRequired') %>');
+                if (!formData.MobileNumber) throw new Error('<%= t('attendants.mobileRequired') %>');
+                if (!formData.HiringDate) throw new Error('<%= t('attendants.hiringDateRequired') %>');
+
+                const url = currentAttendantId ? 
+                    `/api/attendants/${currentAttendantId}` : 
+                    '/api/attendants';
+                
+                const method = currentAttendantId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+                }
+
+                attendantModal.hide();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error saving attendant:', error);
+                alert('<%= t('common.errorSavingAttendant') %>: ' + error.message);
+            }
+        }
+
+        function deleteAttendant(id) {
+            currentAttendantId = id;
+            deleteModal.show();
+        }
+
+        async function confirmDelete() {
+            try {
+                const response = await fetch(`/api/attendants/${currentAttendantId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+                }
+
+                deleteModal.hide();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error deleting attendant:', error);
+                alert('<%= t('common.errorDeletingAttendant') %>: ' + error.message);
+            }
+        }
+
+        function formatPhoneNumber(number) {
+            if (!number) return '';
+            const cleaned = number.toString().replace(/\D/g, '');
+            if (cleaned.length !== 11) return number;
+            return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
+        }
+    </script>
+</body>
+</html>
