@@ -41,39 +41,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .specialty-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
-
-        .specialty-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .specialty-card .card-body {
-            padding: 1.25rem;
-        }
-
-        .specialty-card .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .specialty-card .card-text {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .specialty-card .card-actions {
-            border-top: 1px solid #eee;
-            padding-top: 1rem;
-            margin-top: 1rem;
-        }
-
         /* Modal fixes */
         .modal-backdrop {
             display: none;
@@ -92,6 +59,18 @@
             display: block;
             padding-right: 17px;
         }
+        @media (max-width: 768px) {
+            .tbActions{
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .tbActions{
+                width: 300px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -100,16 +79,17 @@
         
         <main class="main-content">
             <div class="specialties-container">
-                <div class="row mb-4">
+                <div class="row">
                     <div class="col-md-10 justify-content-between align-items-center tituloPage">
                         <%= t('specialties.title') %>                    
                     </div>
                     <div class="col-md-2 d-flex justify-content-end">
-                        <button class="btn btn-primary btn-sm" onclick="openSpecialtyModal()">
+                        <button class="btn btn-primary" onclick="openSpecialtyModal()">
                             <i class="bi bi-plus-lg"></i> <%= t('specialties.add') %>
                         </button>
                     </div>  
                 </div>
+                <br>
 
                 <% if (typeof error !== 'undefined') { %>
                     <div class="alert alert-danger" role="alert">
@@ -117,76 +97,44 @@
                     </div>
                 <% } %>
 
-                <div class="row">
-                                <% if (!specialties || specialties.length === 0) { %>
-                                    <div class="col-12">
-                                        <div class="alert alert-info">
-                                            <%= t('specialties.noSpecialtiesFound') %>
-                                        </div>
-                                    </div>
-                                <% } else { %>
-                                    <!-- Visualização em Tabela (Desktop) -->
-                                    <div class="d-none d-md-block">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th><%= t('specialties.name') %></th>
-                                                        <th><%= t('specialties.description') %></th>
-                                                        <th class="text-end"><%= t('common.actions') %></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <% specialties.forEach(function(specialty) { %>
-                                                        <tr>
-                                                            <td><%= specialty.name || '-' %></td>
-                                                            <td><%= specialty.description || '-' %></td>
-                                                            <td class="text-end">
-                                                                <button class="btn btn-sm btn-primary" onclick="editSpecialty('<%= specialty.id %>')" title="<%= t('common.edit') %>">
-                                                                    <i class="bi bi-pencil"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-danger" onclick="deleteSpecialty('<%= specialty.id %>')" title="<%= t('common.delete') %>">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    <% }); %>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                
-                                    <!-- Visualização em Cards (Mobile) -->
-                                    <div class="d-md-none">
-                                        <div class="row">
-                                            <% specialties.forEach(function(specialty) { %>
-                                                <div class="col-12">
-                                                    <div class="specialty-card">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title"><%= specialty.name || '-' %></h5>
-                                                            <p class="card-text"><%= specialty.description || '-' %></p>
-                                                            <div class="card-actions">
-                                                                <div class="row g-2">
-                                                                    <div class="col-6">
-                                                                        <button class="btn btn-sm btn-primary w-100" onclick="editSpecialty('<%= specialty.id %>')" title="<%= t('common.edit') %>">
-                                                                            <i class="bi bi-pencil"></i> <%= t('common.edit') %>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="col-6">
-                                                                        <button class="btn btn-sm btn-danger w-100" onclick="deleteSpecialty('<%= specialty.id %>')" title="<%= t('common.delete') %>">
-                                                                            <i class="bi bi-trash"></i> <%= t('common.delete') %>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                <div class="table-responsive">
+                    <% if (!specialties || specialties.length === 0) { %>
+                        <div class="alert alert-info">
+                            <%= t('specialties.noSpecialtiesFound') %>
+                        </div>
+                    <% } else { %>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th><%= t('specialties.name') %></th>
+                                    <th><%= t('specialties.description') %></th>
+                                    <th><%= t('common.actions') %></th>
+                                </tr>
+                            </thead>
+                            <tbody id="specialtiesTableBody">
+                                <% specialties.forEach(function(specialty) { %>
+                                    <tr>
+                                        <td data-label="<%= t('specialties.name') %>"><%= specialty.name || '-' %></td>
+                                        <td data-label="<%= t('specialties.description') %>"><%= specialty.description || '-' %></td>
+                                        <td class ="tbActions" data-label="<%= t('common.actions') %>">
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                <button class="btn btn-sm btn-primary w-100" onclick="editSpecialty('<%= specialty.id %>')" title="<%= t('common.edit') %>">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
                                                 </div>
-                                            <% }); %>
-                                        </div>
-                                    </div>
-                                <% } %>
-                    
+                                                <div class="col-6">
+                                                <button class="btn btn-sm btn-danger w-100" onclick="deleteSpecialty('<%= specialty.id %>')" title="<%= t('common.delete') %>">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    <% } %>
                 </div>
             </div>
 
