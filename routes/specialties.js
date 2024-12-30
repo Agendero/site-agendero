@@ -12,16 +12,23 @@ const getApiHeaders = () => ({
 // Get all specialties
 router.get('/', async (req, res) => {
     try {
+        console.log('Fetching specialties from:', `${process.env.URL_API}/specialties`);
+        console.log('Using headers:', getApiHeaders());
+        
         const response = await fetch(`${process.env.URL_API}/specialties`, {
             headers: getApiHeaders()
         });
 
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
             const errorText = await response.text();
+            console.error('Error response body:', errorText);
             throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
         }
 
         const data = await response.json();
+        console.log('Received data:', data);
         res.json(data);
     } catch (error) {
         console.error('Error fetching specialties:', error);
@@ -52,10 +59,15 @@ router.get('/:id', async (req, res) => {
 // Create new specialty
 router.post('/', async (req, res) => {
     try {
+        const specialty = {
+            name: req.body.name,
+            description: req.body.description
+        };
+
         const response = await fetch(`${process.env.URL_API}/specialties`, {
             method: 'POST',
             headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(specialty)
         });
 
         if (!response.ok) {
@@ -74,10 +86,15 @@ router.post('/', async (req, res) => {
 // Update specialty
 router.put('/:id', async (req, res) => {
     try {
+        const specialty = {
+            name: req.body.name,
+            description: req.body.description
+        };
+
         const response = await fetch(`${process.env.URL_API}/specialties/${req.params.id}`, {
             method: 'PUT',
             headers: getApiHeaders(),
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(specialty)
         });
 
         if (!response.ok) {

@@ -48,9 +48,13 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Authentication middleware
 const requireAuth = (req, res, next) => {
+    console.log('Verificando autenticação para:', req.path);
+    console.log('Usuário na sessão:', req.session.user ? 'Sim' : 'Não');
+    
     if (req.session.user) {
         next();
     } else {
+        console.log('Usuário não autenticado, redirecionando para login');
         res.redirect('/');
     }
 };
@@ -95,15 +99,27 @@ app.get('/settings', requireAuth, (req, res) => {
 // Specialties page route
 app.get('/especialidades', requireAuth, async (req, res) => {
     try {
+        debugger; // Ponto de parada aqui
+        console.log('Acessando página de especialidades');
+        console.log('URL da API:', `${apiBaseUrl}/specialties`);
+        console.log('Headers:', getApiHeaders());
+
         const response = await fetch(`${apiBaseUrl}/specialties`, {
             headers: getApiHeaders()
         });
 
+        debugger; // Ponto de parada após a resposta da API
+        console.log('Status da resposta:', response.status);
+
         if (!response.ok) {
-            throw new Error(`API responded with status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Corpo da resposta de erro:', errorText);
+            throw new Error(`API responded with status: ${response.status}. Response: ${errorText}`);
         }
 
         const specialties = await response.json();
+        debugger; // Ponto de parada após processar os dados
+        console.log('Dados recebidos:', specialties);
         
         res.render('specialties', { 
             user: req.session.user,
@@ -111,7 +127,8 @@ app.get('/especialidades', requireAuth, async (req, res) => {
             path: '/especialidades'
         });
     } catch (error) {
-        console.error('Error fetching specialties:', error);
+        debugger; // Ponto de parada se houver erro
+        console.error('Erro ao buscar especialidades:', error);
         res.render('specialties', { 
             user: req.session.user,
             specialties: [],

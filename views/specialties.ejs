@@ -118,38 +118,75 @@
                 <% } %>
 
                 <div class="row">
-                    <% if (!specialties || specialties.length === 0) { %>
-                        <div class="col-12">
-                            <div class="alert alert-info">
-                                <%= t('specialties.noSpecialtiesFound') %>
-                            </div>
-                        </div>
-                    <% } else { %>
-                        <% specialties.forEach(function(specialty) { %>
-                            <div class="col-md-4 col-sm-6">
-                                <div class="specialty-card">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><%= specialty.Name || '-' %></h5>
-                                        <p class="card-text"><%= specialty.Description || '-' %></p>
-                                        <div class="card-actions">
-                                            <div class="row g-2">
-                                                <div class="col-6">
-                                                    <button class="btn btn-sm btn-primary w-100" onclick="editSpecialty('<%= specialty.Id %>')" title="<%= t('common.edit') %>">
-                                                        <i class="bi bi-pencil"></i> <%= t('common.edit') %>
-                                                    </button>
-                                                </div>
-                                                <div class="col-6">
-                                                    <button class="btn btn-sm btn-danger w-100" onclick="deleteSpecialty('<%= specialty.Id %>')" title="<%= t('common.delete') %>">
-                                                        <i class="bi bi-trash"></i> <%= t('common.delete') %>
-                                                    </button>
-                                                </div>
-                                            </div>
+                                <% if (!specialties || specialties.length === 0) { %>
+                                    <div class="col-12">
+                                        <div class="alert alert-info">
+                                            <%= t('specialties.noSpecialtiesFound') %>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        <% }); %>
-                    <% } %>
+                                <% } else { %>
+                                    <!-- Visualização em Tabela (Desktop) -->
+                                    <div class="d-none d-md-block">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th><%= t('specialties.name') %></th>
+                                                        <th><%= t('specialties.description') %></th>
+                                                        <th class="text-end"><%= t('common.actions') %></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% specialties.forEach(function(specialty) { %>
+                                                        <tr>
+                                                            <td><%= specialty.name || '-' %></td>
+                                                            <td><%= specialty.description || '-' %></td>
+                                                            <td class="text-end">
+                                                                <button class="btn btn-sm btn-primary" onclick="editSpecialty('<%= specialty.id %>')" title="<%= t('common.edit') %>">
+                                                                    <i class="bi bi-pencil"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-danger" onclick="deleteSpecialty('<%= specialty.id %>')" title="<%= t('common.delete') %>">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    <% }); %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Visualização em Cards (Mobile) -->
+                                    <div class="d-md-none">
+                                        <div class="row">
+                                            <% specialties.forEach(function(specialty) { %>
+                                                <div class="col-12">
+                                                    <div class="specialty-card">
+                                                        <div class="card-body">
+                                                            <h5 class="card-title"><%= specialty.name || '-' %></h5>
+                                                            <p class="card-text"><%= specialty.description || '-' %></p>
+                                                            <div class="card-actions">
+                                                                <div class="row g-2">
+                                                                    <div class="col-6">
+                                                                        <button class="btn btn-sm btn-primary w-100" onclick="editSpecialty('<%= specialty.id %>')" title="<%= t('common.edit') %>">
+                                                                            <i class="bi bi-pencil"></i> <%= t('common.edit') %>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <button class="btn btn-sm btn-danger w-100" onclick="deleteSpecialty('<%= specialty.id %>')" title="<%= t('common.delete') %>">
+                                                                            <i class="bi bi-trash"></i> <%= t('common.delete') %>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    </div>
+                                <% } %>
+                    
                 </div>
             </div>
 
@@ -256,9 +293,9 @@
                 const specialty = await response.json();
                 
                 // Fill form fields
-                document.getElementById('specialtyId').value = specialty.Id || '';
-                document.getElementById('name').value = specialty.Name || '';
-                document.getElementById('description').value = specialty.Description || '';
+                document.getElementById('specialtyId').value = specialty.id || '';
+                document.getElementById('name').value = specialty.name || '';
+                document.getElementById('description').value = specialty.description || '';
                 
                 document.getElementById('modalTitle').textContent = '<%= t('specialties.edit') %>';
                 specialtyModal.show();
@@ -271,11 +308,11 @@
         async function saveSpecialty() {
             try {
                 const formData = {
-                    Name: document.getElementById('name')?.value?.trim() || '',
-                    Description: document.getElementById('description')?.value?.trim() || ''
+                    name: document.getElementById('name')?.value?.trim() || '',
+                    description: document.getElementById('description')?.value?.trim() || ''
                 };
 
-                if (!formData.Name) {
+                if (!formData.name) {
                     throw new Error('<%= t('specialties.nameRequired') %>');
                 }
 
